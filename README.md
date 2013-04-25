@@ -9,6 +9,8 @@ SikuliX-API is targeted at people who want to develop programs in Java, other Ja
 <br /><br />
 The downloadable packages of SikuliX-API contain everything needed to develop, test, run and debug with any suitable IDE (e.g. Eclipse, Netbeans, ...) or however you like ;-).
 <br /><br />
+If new to Sikuli, you might aternatively be interested in the pure Java implementation, which is to some extent feature compatible, but not API compatible, called Sikuli Java API (http://code.google.com/p/sikuli-api).
+<br /><br />
 **Roadmap**
  - **2013 May 22:** release of SikuliX-API 1.0
   - there will be packages for Windows, Mac and Linux both 32- and 64-Bit
