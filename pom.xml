@@ -42,7 +42,7 @@
 				</os>
 			</activation>
 			<properties>
-				<native.libs.dir>../Resources/natives/Win/libs64</native.libs.dir>
+				<native.libs.dir>Native/Win/libs64</native.libs.dir>
 			</properties>
 		</profile>
 		<profile>
@@ -54,7 +54,7 @@
 				</os>
 			</activation>
 			<properties>
-				<native.libs.dir>../Resources/natives/Win/libs32</native.libs.dir>
+				<native.libs.dir>Native/Win/libs32</native.libs.dir>
 			</properties>
 		</profile>
 		<profile>
@@ -66,7 +66,7 @@
 				</os>
 			</activation>
 			<properties>
-				<native.libs.dir>../Resources/natives/Linux/libs32</native.libs.dir>
+				<native.libs.dir>Native/Linux/libs32</native.libs.dir>
 			</properties>
 		</profile>
 		<profile>
@@ -78,7 +78,7 @@
 				</os>
 			</activation>
 			<properties>
-				<native.libs.dir>../Resources/natives/Win/libs64</native.libs.dir>
+				<native.libs.dir>Native/Win/libs64</native.libs.dir>
 			</properties>
 		</profile>
 		<profile>
@@ -89,7 +89,7 @@
 				</os>
 			</activation>
 			<properties>
-				<native.libs.dir>../Resources/natives/Win/libs</native.libs.dir>
+				<native.libs.dir>Native/Win/libs</native.libs.dir>
 			</properties>
 		</profile>
 	</profiles>
