@@ -62,7 +62,7 @@
 			<activation>
 				<os>
 					<name>linux</name>
-					<arch>i386</arch> <!-- TODO: Check if this is the right value -->
+					<arch>i386</arch>
 				</os>
 			</activation>
 			<properties>
@@ -74,7 +74,7 @@
 			<activation>
 				<os>
 					<name>linux</name>
-					<arch>x64</arch> <!-- TODO: Check if this is the right value -->
+					<arch>x86_64</arch> <!-- TODO: Check if this is the right value -->
 				</os>
 			</activation>
 			<properties>
@@ -82,16 +82,29 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>Mac</id>
+			<id>Mac32bit</id>
 			<activation>
 				<os>
-					<family>mac</family> <!-- TODO: Check if this is the right value -->
+					<family>mac</family> 
+					<arch>i386</arch> <!-- TODO: Check if this is the right value -->
 				</os>
 			</activation>
 			<properties>
 				<native.libs.dir>Native/Win/libs</native.libs.dir>
 			</properties>
 		</profile>
+		<profile>
+            <id>Mac64bit</id>
+            <activation>
+                <os>
+                    <family>mac</family> 
+                    <arch>x86_64</arch> <!-- TODO: Check if this is the right value -->
+                </os>
+            </activation>
+            <properties>
+                <native.libs.dir>Native/Win/libs</native.libs.dir>
+            </properties>
+        </profile>
 	</profiles>
 
 	<properties>

@@ -3,8 +3,16 @@
 # Package Files #
 *.jar
 /Target
+
+# linux temp files #
 *~
+
+# Eclipse project files #
 .project
 .settings/
 .classpath
+.pydevproject
+
+# output directories #
 /bin
+/testclasses
