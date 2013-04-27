@@ -142,8 +142,17 @@
 
 		<dependency>
 			<groupId>org.python</groupId>
-			<artifactId>jython</artifactId>
-			<version>2.5.4-rc1</version>
+			<artifactId>jython-standalone</artifactId>
+			<version>2.5.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.0</version>
+			<type>jar</type>
+			<scope>test</scope>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 
@@ -161,11 +170,14 @@
 			</plugins>
 		</pluginManagement>
 
-		<finalName>sikuli-script</finalName> 
+		<finalName>sikuli-script</finalName>
 		<sourceDirectory>Java</sourceDirectory> <!-- source directory for java source -->
 		<outputDirectory>Target</outputDirectory> <!-- target directory for compiled java classes -->
+		<directory>Target</directory> <!-- directory to place generated jars -->
+		<testSourceDirectory>Java-Test</testSourceDirectory> <!-- source directory for java tests -->
+		<!--<testOutputDirectory>testclasses</testOutputDirectory> --> <!-- target directory for compiled java test classes -->
 
-        <!-- copy python and native resources -->
+		<!-- copy python and native resources -->
 		<resources>
 			<resource> <!-- Jython Resources -->
 				<directory>Jython</directory>
