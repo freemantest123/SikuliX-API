@@ -5,7 +5,9 @@ SikuliX-API
 
 Sikuli's Java API supporting visual testing and automation (currently using JNI/C++ to integrate with OpenCV and Tesseract)
 
-SikuliX-API is targeted at people who want to develop programs in Java, other Java based languages or Java aware scripting languages currently not supported by SikuliX-IDE (https://github.com/RaiMan/SikuliX-IDE).
+SikuliX-API is targeted at people who want to develop, run and debug programs in Java, other Java based languages or Java aware scripting languages currently not supported by SikuliX-IDE (https://github.com/RaiMan/SikuliX-IDE).
+
+Same goes for people who want to develop, run and debug scripts using SikuliX-IDE supported scripting languages in other IDE's like Eclipse, Netbeans, ... 
 <br /><br />
 The downloadable packages of SikuliX-API contain everything needed to develop, test, run and debug with any suitable IDE (e.g. Eclipse, Netbeans, ...) or however you like ;-).
 <br /><br />
