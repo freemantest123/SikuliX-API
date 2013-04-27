@@ -85,7 +85,7 @@
 			<id>Mac32bit</id>
 			<activation>
 				<os>
-					<family>mac</family> 
+					<family>mac</family>
 					<arch>i386</arch> <!-- TODO: Check if this is the right value -->
 				</os>
 			</activation>
@@ -94,17 +94,17 @@
 			</properties>
 		</profile>
 		<profile>
-            <id>Mac64bit</id>
-            <activation>
-                <os>
-                    <family>mac</family> 
-                    <arch>x86_64</arch> <!-- TODO: Check if this is the right value -->
-                </os>
-            </activation>
-            <properties>
-                <native.libs.dir>Native/Win/libs</native.libs.dir>
-            </properties>
-        </profile>
+			<id>Mac64bit</id>
+			<activation>
+				<os>
+					<family>mac</family>
+					<arch>x86_64</arch> <!-- TODO: Check if this is the right value -->
+				</os>
+			</activation>
+			<properties>
+				<native.libs.dir>Native/Win/libs</native.libs.dir>
+			</properties>
+		</profile>
 	</profiles>
 
 	<properties>
@@ -173,13 +173,31 @@
 		<pluginManagement>
 			<plugins>
 				<!-- Enable this plugin to include execute action (needed for eclipse) 
-					<plugin> <groupId>org.eclipse.m2e</groupId> <artifactId>lifecycle-mapping</artifactId> 
-					<version>1.0.0</version> <configuration> <lifecycleMappingMetadata> <pluginExecutions> 
-					<pluginExecution> <pluginExecutionFilter> <groupId>org.codehaus.mojo</groupId> 
-					<artifactId>aspectj-maven-plugin</artifactId> <versionRange>[1.0,)</versionRange> 
-					<goals> <goal>test-compile</goal> <goal>compile</goal> </goals> </pluginExecutionFilter> 
-					<action> <execute /> </action> </pluginExecution> </pluginExecutions> </lifecycleMappingMetadata> 
-					</configuration> </plugin> -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>aspectj-maven-plugin</artifactId>
+										<versionRange>[1.0,)</versionRange>
+										<goals>
+											<goal>test-compile</goal>
+											<goal>compile</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>-->
 			</plugins>
 		</pluginManagement>
 
@@ -200,9 +218,9 @@
 				<directory>${native.libs.dir}</directory>
 				<targetPath>META-INF/lib</targetPath>
 			</resource>
-			<resource>
-			    <directory>Native/All/tessdata</directory>
-			    <targetPath>tessdata</targetPath>
+			<resource> <!-- Tessdata for tesseract -->
+				<directory>Native/All/tessdata</directory>
+				<targetPath>tessdata</targetPath>
 			</resource>
 		</resources>
 
@@ -259,6 +277,25 @@
 						</manifest>
 					</archive>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>Jython</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
