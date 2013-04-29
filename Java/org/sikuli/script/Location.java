@@ -84,6 +84,8 @@ public class Location extends Point {
     return s;
   }
 
+
+// TODO Location.getColor() implement more support and make it useable
   /**
    * Get the color at the given Point for details: see java.awt.Robot and ...Color
    *
