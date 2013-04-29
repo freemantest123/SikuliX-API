@@ -69,7 +69,7 @@ public class FileManager {
     } catch (Error e) {
       Debug.error(FileManager.class.getName() + ".loadLibrary: Native library could not be loaded: " + libname);
       if (libFound) {
-        Debug.error("Since native library was found, it might be a problems with needed dependent libraries");
+        Debug.error("Since native library was found, it might be a problem with needed dependent libraries");
 				e.printStackTrace();
       }
       System.exit(1);
