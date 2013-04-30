@@ -1,7 +1,7 @@
 SikuliX-API
 ===========
 
-**Current version: 1.0 Beta351 (branch master)** --- [click for downloadable packages](https://github.com/RaiMan/SikuliX-API/wiki/Packages)
+**Current version: 1.0 Beta500 (branch master)** --- [click for downloadable packages](https://github.com/RaiMan/SikuliX-API/wiki/Packages)
 
 Sikuli's Java API supporting visual testing and automation (currently using JNI/C++ to integrate with OpenCV and Tesseract)
 
