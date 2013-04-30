@@ -119,7 +119,11 @@ public class Key {
   public static final char C_MULTIPLY = '\ue03E';
   public static final String DIVIDE = "\ue03F";
   public static final char C_DIVIDE = '\ue03F';
-  //</editor-fold>
+  public static final String DECIMAL = "\ue040";
+  public static final char C_DECIMAL = '\ue040'; // VK_DECIMAL
+  public static final String CONTEXT = "\ue041";
+  public static final char C_CONTEXT = '\ue041'; // VK_CONTEXT_MENU
+//</editor-fold>
 
   /**
    * Convert Sikuli Key to Java virtual key code
@@ -303,6 +307,8 @@ public class Key {
       case Key.C_MINUS:     return new int[]{KeyEvent.VK_MINUS};
       case Key.C_MULTIPLY:  return new int[]{KeyEvent.VK_MULTIPLY};
       case Key.C_DIVIDE:    return new int[]{KeyEvent.VK_DIVIDE};
+      case Key.C_DECIMAL:   return new int[]{KeyEvent.VK_DECIMAL};
+      case Key.C_CONTEXT:   return new int[]{KeyEvent.VK_CONTEXT_MENU};
 
       default:
         throw new IllegalArgumentException("Cannot convert character " + key);
@@ -373,6 +379,8 @@ public class Key {
       case Key.C_MINUS: return "#NSUB.";
       case Key.C_MULTIPLY: return "#NMUL";
       case Key.C_DIVIDE: return "#NDIV.";
+      case Key.C_DECIMAL: return "#NDEC.";
+      case Key.C_CONTEXT: return "#NCON.";
 
       default:
         return "" + key;

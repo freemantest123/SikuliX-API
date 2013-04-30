@@ -16,25 +16,28 @@ public class Settings {
 
   public static boolean makeJythonRegion = false;
 
+  public static String libPath = null;
+  private static final String sikhomeEnv = System.getenv("SIKULI_HOME");
+  private static final String sikhomeProp = System.getProperty("sikuli.Home");
+  public static final String libSub = slashify("SikuliX/libs", false);
+
 	/**
 	 * Mac: standard place for native libs
 	 */
 	public static String libPathMac = "/Applications/SikuliX.app/Contents/libs";
-  public static String libPath = null;
-  public static String libPathStd = null;
-  private static final String sikhomeEnv = System.getenv("SIKULI_HOME");
-  private static final String sikhomeProp = System.getProperty("sikuli.Home");
-	/**
+
+  /**
 	 * Win: standard place for native libs
 	 */
-  public static final String libSub = slashify("SikuliX/libs", false);
 	public static final String libPathWin = slashify(System.getenv("ProgramFiles"), true)+libSub;
 	public static final String libPathWin32 = slashify(System.getenv("ProgramFiles(x86)"), true)+libSub;
-	/**
+
+  /**
 	 * location of folder Tessdata
 	 */
 	public static String OcrDataPath;
-	/**
+
+  /**
 	 * standard place in the net to get information about extensions<br />
 	 * needs a file extensions.json with content<br />
 	 * {"extension-list":<br />
@@ -57,12 +60,15 @@ public class Settings {
 	 */
   public static String SikuliRepo;
   private static String[] args = new String[0];
-
- 	public final static String SikuliVersionDefault = "SikuliX-1.0";
-  public final static int SikuliVersionBetaN = 351;
- 	public static String SikuliVersionBeta = SikuliVersionDefault + "-Beta" + SikuliVersionBetaN;
-	public static String SikuliVersion = "#sikuliversion#";
   public static String[] ServerList = {"https://dl.dropbox.com/u/42895525/SikuliX"};
+
+  public final static String SikuliVersionDefaultIDE = "SikuliX-IDE-1.0";
+  public final static String SikuliVersionDefault = "SikuliX-1.0";
+  public final static int SikuliVersionBetaN = 500;
+ 	public static String SikuliVersionBeta = SikuliVersionDefault + "-Beta" + SikuliVersionBetaN;
+ 	public static String SikuliVersionBetaIDE = SikuliVersionDefaultIDE + "-Beta" + SikuliVersionBetaN;
+	public static String SikuliVersion = "#sikuliversion#";
+  public static String SikuliVersionIDE;
 
 	static {
     Properties props = System.getProperties();
@@ -93,6 +99,8 @@ public class Settings {
     if (isMac() && libPath == null) {
       if (!(new File(libPathMac)).exists()) {
         libPath = slashify("/Applications/" + libSub, true);
+      } else {
+        libPath = libPathMac;
       }
     }
 
@@ -114,9 +122,11 @@ public class Settings {
 		}
     if (SikuliVersionBetaN > 0) {
       SikuliVersion = SikuliVersionBeta;
+      SikuliVersionIDE = SikuliVersionBetaIDE;
     } else if ("#sikuliversion#".equals(SikuliVersion)) {
       SikuliVersion = SikuliVersionDefault;
-	}
+      SikuliVersionIDE = SikuliVersionDefaultIDE;
+  	}
 	}
 
 	public static final int ISWINDOWS = 0;
