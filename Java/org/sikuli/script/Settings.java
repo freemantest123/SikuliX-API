@@ -62,10 +62,13 @@ public class Settings {
   private static String[] args = new String[0];
   public static String[] ServerList = {"https://dl.dropbox.com/u/42895525/SikuliX"};
 
- 	public final static String SikuliVersionDefault = "SikuliX-1.0";
-  public final static int SikuliVersionBetaN = 351;
+  public final static String SikuliVersionDefaultIDE = "SikuliX-IDE-1.0";
+  public final static String SikuliVersionDefault = "SikuliX-1.0";
+  public final static int SikuliVersionBetaN = 500;
  	public static String SikuliVersionBeta = SikuliVersionDefault + "-Beta" + SikuliVersionBetaN;
+ 	public static String SikuliVersionBetaIDE = SikuliVersionDefaultIDE + "-Beta" + SikuliVersionBetaN;
 	public static String SikuliVersion = "#sikuliversion#";
+  public static String SikuliVersionIDE;
 
 	static {
     Properties props = System.getProperties();
@@ -119,9 +122,11 @@ public class Settings {
 		}
     if (SikuliVersionBetaN > 0) {
       SikuliVersion = SikuliVersionBeta;
+      SikuliVersionIDE = SikuliVersionBetaIDE;
     } else if ("#sikuliversion#".equals(SikuliVersion)) {
       SikuliVersion = SikuliVersionDefault;
-	}
+      SikuliVersionIDE = SikuliVersionDefaultIDE;
+  	}
 	}
 
 	public static final int ISWINDOWS = 0;
