@@ -26,7 +26,7 @@ import org.sikuli.script.ScreenHighlighter;
 import org.sikuli.script.Settings;
 
 /**
- * Executes Sikuliscripts written in Pyhton/Jython.
+ * Executes Sikuliscripts written in Python/Jython.
  */
 public class JythonScriptRunner implements IScriptRunner {
 
