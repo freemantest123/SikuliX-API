@@ -32,19 +32,8 @@
 		<url>git://github.com/RaiMan/SikuliX-API.git</url>
 	</scm>
 
+    <!-- Profiles are needed to include the right native resources -->
 	<profiles>
-		<profile>
-			<id>Windows64bit</id>
-			<activation>
-				<os>
-					<family>windows</family>
-					<arch>x64</arch> <!-- TODO: Check if this is the right value -->
-				</os>
-			</activation>
-			<properties>
-				<native.libs.dir>Native/Win/libs64</native.libs.dir>
-			</properties>
-		</profile>
 		<profile>
 			<id>Windows32bit</id>
 			<activation>
@@ -54,7 +43,19 @@
 				</os>
 			</activation>
 			<properties>
-				<native.libs.dir>Native/Win/libs32</native.libs.dir>
+				<native.libs.dir>src/main/resources-win/libs32/</native.libs.dir>
+			</properties>
+		</profile>
+		<profile>
+			<id>Windows64bit</id>
+			<activation>
+				<os>
+					<family>windows</family>
+					<arch>x64</arch> <!-- TODO: Check if this is the right value -->
+				</os>
+			</activation>
+			<properties>
+				<native.libs.dir>src/main/resources-win/libs64/</native.libs.dir>
 			</properties>
 		</profile>
 		<profile>
@@ -66,7 +67,7 @@
 				</os>
 			</activation>
 			<properties>
-				<native.libs.dir>Native/Linux/libs32</native.libs.dir>
+				<native.libs.includes>src/main/resources-linux/libs32/</native.libs.includes>
 			</properties>
 		</profile>
 		<profile>
@@ -78,7 +79,7 @@
 				</os>
 			</activation>
 			<properties>
-				<native.libs.dir>Native/Win/libs64</native.libs.dir>
+				<native.libs.dir>src/main/resources-linux/libs64/</native.libs.dir>
 			</properties>
 		</profile>
 		<profile>
@@ -90,7 +91,7 @@
 				</os>
 			</activation>
 			<properties>
-				<native.libs.dir>Native/Win/libs</native.libs.dir>
+				<native.libs.dir>src/main/resources-mac/libs32/</native.libs.dir>
 			</properties>
 		</profile>
 		<profile>
@@ -102,7 +103,7 @@
 				</os>
 			</activation>
 			<properties>
-				<native.libs.dir>Native/Win/libs</native.libs.dir>
+				<native.libs.dir>src/main/resources-mac/libs64/</native.libs.dir>
 			</properties>
 		</profile>
 	</profiles>
@@ -172,7 +173,7 @@
 	<build>
 		<pluginManagement>
 			<plugins>
-				<!-- Enable this plugin to include execute action (needed for eclipse) 
+				<!-- Enable this plugin to include execute action (needed for eclipse) -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -197,30 +198,22 @@
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
-				</plugin>-->
+				</plugin>
 			</plugins>
 		</pluginManagement>
 
 		<finalName>sikuli-script</finalName>
-		<sourceDirectory>Java</sourceDirectory> <!-- source directory for java source -->
-		<outputDirectory>Target</outputDirectory> <!-- target directory for compiled java classes -->
-		<directory>Target</directory> <!-- directory to place generated jars -->
-		<testSourceDirectory>Java-Test</testSourceDirectory> <!-- source directory for java tests -->
-		<!--<testOutputDirectory>testclasses</testOutputDirectory> --> <!-- target directory for compiled java test classes -->
 
 		<!-- copy python and native resources -->
 		<resources>
-			<resource> <!-- Jython Resources -->
-				<directory>Jython</directory>
-				<targetPath>Lib</targetPath>
+			<resource> <!-- Jython Resources: Python files -->
+				<directory>src/main/jython/sikuli</directory>
+				<targetPath>Lib/sikuli</targetPath>
 			</resource>
+
 			<resource> <!-- Native Resources, OS dependent -->
-				<directory>${native.libs.dir}</directory>
+				<directory>${native.libs.includes}</directory>
 				<targetPath>META-INF/lib</targetPath>
-			</resource>
-			<resource> <!-- Tessdata for tesseract -->
-				<directory>Native/All/tessdata</directory>
-				<targetPath>tessdata</targetPath>
 			</resource>
 		</resources>
 
@@ -270,6 +263,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -291,7 +285,7 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>Jython</source>
+								<source>src/main/jython</source>
 							</sources>
 						</configuration>
 					</execution>
