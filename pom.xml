@@ -32,7 +32,7 @@
 		<url>git://github.com/RaiMan/SikuliX-API.git</url>
 	</scm>
 
-    <!-- Profiles are needed to include the right native resources -->
+  <!-- Profiles are needed to include the right native resources -->
 	<profiles>
 		<profile>
 			<id>Windows32bit</id>
@@ -83,27 +83,15 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>Mac32bit</id>
+			<id>Mac</id>
 			<activation>
 				<os>
 					<family>mac</family>
-					<arch>i386</arch> <!-- TODO: Check if this is the right value -->
+					<arch>x86_64</arch> 
 				</os>
 			</activation>
 			<properties>
-				<native.libs.dir>src/main/resources-mac/libs32/</native.libs.dir>
-			</properties>
-		</profile>
-		<profile>
-			<id>Mac64bit</id>
-			<activation>
-				<os>
-					<family>mac</family>
-					<arch>x86_64</arch> <!-- TODO: Check if this is the right value -->
-				</os>
-			</activation>
-			<properties>
-				<native.libs.dir>src/main/resources-mac/libs64/</native.libs.dir>
+				<native.libs.dir>src/main/resources-mac/libs/</native.libs.dir>
 			</properties>
 		</profile>
 	</profiles>
@@ -212,16 +200,16 @@
 			</resource>
 
 			<resource> <!-- Native Resources, OS dependent -->
-				<directory>${native.libs.includes}</directory>
-				<targetPath>META-INF/lib</targetPath>
+				<directory>${native.libs.dir}</directory>
+				<targetPath>META-INF/libs</targetPath>
 			</resource>
 		</resources>
 
 		<plugins>
-			<!-- Enable this plugin to print info about the os <plugin> <groupId>org.apache.maven.plugins</groupId> 
-				<artifactId>maven-antrun-plugin</artifactId> <version>1.7</version> <executions> 
-				<execution> <id>compile</id> <phase>compile</phase> <goals> <goal>run</goal> 
-				</goals> <configuration> <target> <echo message="${os.name}" /> <echo message="${os.arch}" 
+			<!-- Enable this plugin to print info about the os <plugin> <groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId> <version>1.7</version> <executions>
+				<execution> <id>compile</id> <phase>compile</phase> <goals> <goal>run</goal>
+				</goals> <configuration> <target> <echo message="${os.name}" /> <echo message="${os.arch}"
 				/> </target> </configuration> </execution> </executions> </plugin> -->
 
 			<plugin>
