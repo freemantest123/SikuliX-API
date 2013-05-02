@@ -16,3 +16,6 @@
 # output directories #
 /bin
 
+# python runtime stuff #
+/cachedir
+

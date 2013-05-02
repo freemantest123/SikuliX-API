@@ -163,7 +163,7 @@ public class Settings {
 	/**
 	 * in-jar folder to load native libs from
 	 */
-	public static String libSource = "META-INF/lib/";
+	public static String libSource = "META-INF/libs/";
 	public static boolean OcrTextSearch = false;
 	public static boolean OcrTextRead = false;
 
