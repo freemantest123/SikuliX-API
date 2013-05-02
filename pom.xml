@@ -7,7 +7,7 @@
 	<artifactId>SikuliX-API</artifactId>
 	<name>SikuliX-API</name>
 	<url>http://www.sikuli.org</url>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>jar</packaging>
 
 	<licenses>
@@ -23,6 +23,11 @@
 			<id>kelthuzad</id>
 			<name>kelthuzad</name>
 			<email>j_the_k@web.de</email>
+		</developer>
+		<developer>
+			<id>RaiMan</id>
+			<name>RaiMan</name>
+			<email>rmhdevelop@me.com</email>
 		</developer>
 	</developers>
 
@@ -144,8 +149,8 @@
 
 		<dependency>
 			<groupId>org.python</groupId>
-			<artifactId>jython-standalone</artifactId>
-			<version>2.5.2</version>
+			<artifactId>jython</artifactId>
+			<version>2.5.4-rc1</version>
 		</dependency>
 
 		<dependency>
@@ -195,12 +200,22 @@
 		<!-- copy python and native resources -->
 		<resources>
 			<resource> <!-- Jython Resources: Python files -->
-				<directory>src/main/jython/sikuli</directory>
-				<targetPath>Lib/sikuli</targetPath>
+				<directory>src/main/resources-jython/</directory>
+				<targetPath>./</targetPath>
+			</resource>
+
+			<resource> <!-- Jython Resources: Python files -->
+				<directory>src/main/resources-jython-sikuli/</directory>
+				<targetPath>Lib/</targetPath>
 			</resource>
 
 			<resource> <!-- Native Resources, OS dependent -->
 				<directory>${native.libs.dir}</directory>
+				<targetPath>META-INF/libs</targetPath>
+			</resource>
+
+      <resource> <!-- Native Resources, not OS dependent -->
+				<directory>src/main/resources/libs/</directory>
 				<targetPath>META-INF/libs</targetPath>
 			</resource>
 		</resources>
@@ -238,7 +253,9 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-			<!-- Plugin to create an executable jar and a jar with dependencies included -->
+
+      <!-- Plugin to create an executable jar and a jar with dependencies included -->
+      <!-- does not make sense for me - more a special individual case. RaiMan
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.4</version>
@@ -264,6 +281,8 @@
 					</execution>
 				</executions>
 			</plugin>
+      *** does not make sense fro me. RaiMan -->
+
 			<!-- Plugin to create an executable jar -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -277,7 +296,9 @@
 					</archive>
 				</configuration>
 			</plugin>
-			<plugin>
+
+<!-- seems doubled to above <resources>
+      <plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
 				<version>1.8</version>
@@ -296,6 +317,7 @@
 					</execution>
 				</executions>
 			</plugin>
+-->
 		</plugins>
 	</build>
 </project>

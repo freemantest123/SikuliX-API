@@ -54,7 +54,9 @@ public class SikuliScript {
         String[] sargs = CommandArgs.getPyArgs(cmdLine);
         String[] jy_args = null;
         String[] iargs = {"-i", "-c",
-					"from sikuli import *; SikuliScript.runningInteractive = True; "
+          ""
+//					+ "import sys; print sys.path; "
+          + "from sikuli import *; SikuliScript.runningInteractive = True; "
 					+ "print \"Hello, this is your interactive Sikuli (rules for interactive Python apply)\\n"
 					+ "use the UP/DOWN arrow keys to walk through the input history\\n"
 					+ "help()<enter> will output some basic Python information\\n"
