@@ -136,12 +136,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.explodingpixels</groupId>
-			<artifactId>mac_widgets</artifactId>
-			<version>0.9.5</version>
-		</dependency>
-
-		<dependency>
 			<groupId>jxgrabkey</groupId>
 			<artifactId>jxgrabkey</artifactId>
 			<version>1.0</version>
@@ -149,7 +143,7 @@
 
 		<dependency>
 			<groupId>org.python</groupId>
-			<artifactId>jython</artifactId>
+			<artifactId>jython-standalone</artifactId>
 			<version>2.5.4-rc1</version>
 		</dependency>
 
@@ -195,16 +189,11 @@
 			</plugins>
 		</pluginManagement>
 
-		<finalName>sikuli-script</finalName>
+		<finalName>sikuli-japi</finalName>
 
 		<!-- copy python and native resources -->
 		<resources>
-			<resource> <!-- Jython Resources: Python files -->
-				<directory>src/main/resources-jython/</directory>
-				<targetPath>./</targetPath>
-			</resource>
-
-			<resource> <!-- Jython Resources: Python files -->
+			<resource> <!-- Sikuli Jython Resources: Python files -->
 				<directory>src/main/resources-jython-sikuli/</directory>
 				<targetPath>Lib/</targetPath>
 			</resource>
@@ -254,8 +243,6 @@
 				</configuration>
 			</plugin>
 
-      <!-- Plugin to create an executable jar and a jar with dependencies included -->
-      <!-- does not make sense for me - more a special individual case. RaiMan
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.4</version>
@@ -268,7 +255,7 @@
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
-					<finalName>sikuli-script-with-dependencies</finalName>
+					<finalName>sikuli-script</finalName>
 					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 				<executions>
@@ -281,9 +268,8 @@
 					</execution>
 				</executions>
 			</plugin>
-      *** does not make sense fro me. RaiMan -->
 
-			<!-- Plugin to create an executable jar -->
+			<!-- Plugin to create an executable jar
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -296,6 +282,7 @@
 					</archive>
 				</configuration>
 			</plugin>
+      -->
 
 <!-- seems doubled to above <resources>
       <plugin>
