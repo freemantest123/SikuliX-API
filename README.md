@@ -11,6 +11,8 @@ Same goes for people who want to develop, run and debug scripts using SikuliX-ID
 <br /><br />
 The downloadable packages of SikuliX-API contain everything needed to develop, test, run and debug with any suitable IDE (e.g. Eclipse, Netbeans, ...) or however you like ;-).
 <br /><br />
+This repo now (Beta500+) is **based on Maven** and can produce a sikuli-script.jar (containing all stuff: Java, Jython and native libs) and a lightweight sikuli-japi.jar, that only contains the Sikuli Java and Jython source stuff and the needed native libs and is intended for use in pure Java or in Java aware scripting and testing environments. [... click for more info](https://github.com/RaiMan/SikuliX-API/wiki/Maven-support)
+<br /><br />
 If new to Sikuli, you might aternatively be interested in the pure Java implementation, which is to some extent feature compatible, but not API compatible, called Sikuli Java API (http://code.google.com/p/sikuli-api).
 <br /><br />
 **Roadmap**
