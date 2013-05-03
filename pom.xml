@@ -197,7 +197,7 @@
 
         <finalName>sikuli-japi</finalName>
 
-        <!-- copy python and native resources -->
+        <!-- copy jython and native resources -->
         <resources>
             <resource> <!-- Jython Resources: Python files -->
                 <directory>src/main/jython/sikuli</directory>
