@@ -32,8 +32,10 @@ public class FileManager {
   private static StringBuffer alreadyLoaded = new StringBuffer("");
 	static final int DOWNLOAD_BUFFER_SIZE = 153600;
   private static List<String> libsList = new ArrayList<String>();
+  private static ClassLoader cl;
 
   static {
+    cl = FileManager.class.getClassLoader();
     libPaths.add(Settings.libPath);
     //TODO extractLibs();
   }
@@ -102,7 +104,6 @@ public class FileManager {
      * if we don't find a .jnilib, try .dylib instead.
      */
     if (!outfile.exists()) {
-			ClassLoader cl = ClassLoader.getSystemClassLoader();
 			URL res = cl.getResource(libSource + mappedlib);
       if (res == null) {
         if (mappedlib.endsWith(".jnilib")) {
@@ -110,7 +111,7 @@ public class FileManager {
           String jnilib = mappedlib.toString();
           outfile = new File(getJniDir(), jnilib);
           if (!outfile.exists()) {
-            if (ClassLoader.getSystemClassLoader().getResource(libSource + mappedlib) == null) {
+            if (cl.getResource(libSource + mappedlib) == null) {
               throw new IOException("Library " + mappedlib + " not on classpath nor in default location");
             } // else copy lib from jar
           } else {
@@ -175,7 +176,7 @@ public class FileManager {
    * @throws IOException
    */
   private static File extractJniResource(String resourcename, File outputfile) throws IOException {
-    InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream(resourcename);
+    InputStream in = cl.getResourceAsStream(resourcename);
     if (in == null) {
       throw new IOException("Resource " + resourcename + " not on classpath");
     }
@@ -240,7 +241,6 @@ public class FileManager {
 	 * @return the local path to the extracted resources
 	 */
 	public static String extract(String path) throws IOException {
-		ClassLoader cl = ClassLoader.getSystemClassLoader();
 		InputStream in = cl.getResourceAsStream(path + "/filelist.txt");
 		String localPath = System.getProperty("java.io.tmpdir") + "/sikuli/" + path;
 		new File(localPath).mkdirs();
@@ -250,7 +250,6 @@ public class FileManager {
 	}
 
 	private static void writeFileList(InputStream ins, String fromPath, String outPath) throws IOException {
-		ClassLoader cl = ClassLoader.getSystemClassLoader();
 		BufferedReader r = new BufferedReader(new InputStreamReader(ins));
 		String line;
 		while ((line = r.readLine()) != null) {
