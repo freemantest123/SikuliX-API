@@ -14,7 +14,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
+import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -29,9 +31,11 @@ public class FileManager {
   private static final ArrayList<String> libPaths = new ArrayList<String>();
   private static StringBuffer alreadyLoaded = new StringBuffer("");
 	static final int DOWNLOAD_BUFFER_SIZE = 153600;
+  private static List<String> libsList = new ArrayList<String>();
 
   static {
     libPaths.add(Settings.libPath);
+    //TODO extractLibs();
   }
 
   /**
@@ -195,7 +199,42 @@ public class FileManager {
     return extractJniResource(resourcename, new File(outputname));
   }
 
-	/**
+  private static void extractLibs() {
+    Debug.log(2, "FileManager: trying to acces jar");
+    CodeSource src = FileManager.class.getProtectionDomain().getCodeSource();
+    int iDir=0, iFile=0;
+    if (src != null) {
+      URL jar = src.getLocation();
+      if (! jar.toString().endsWith(".jar")) {
+        Debug.log(2,"FileManager: not running from jar");
+      } else {
+        try {
+          ZipInputStream zip = new ZipInputStream(jar.openStream());
+          ZipEntry ze;
+          Debug.log(2, "FileManager: accessing jar: " + jar.toString());
+          while ((ze = zip.getNextEntry()) != null) {
+            String entryName = ze.getName();
+            if (entryName.startsWith("META-INF/libs")) {
+              //Debug.log(2, "FileManager: "+entryName);
+              libsList.add( entryName  );
+              if (entryName.endsWith(File.separator)) {
+                iDir++;
+              } else {
+                iFile++;
+              }
+            }
+          }
+          Debug.log(2, "FileManager: found in META-INF/libs: Dirs: "+iDir+" Files: "+iFile );
+        } catch (IOException e) {
+          Debug.error("FileManager: List jar did not work");
+        }
+      }
+    } else {
+      Debug.error("FileManager: cannot access jar");
+    }
+  }
+
+  /**
 	 * Assume the list of resources can be found at path/filelist.txt
    *
 	 * @return the local path to the extracted resources
