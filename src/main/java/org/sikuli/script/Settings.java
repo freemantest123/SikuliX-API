@@ -10,7 +10,6 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.security.CodeSource;
 import java.util.Date;
-import java.util.Properties;
 import org.sikuli.system.OSUtil;
 
 public class Settings {
@@ -21,6 +20,7 @@ public class Settings {
   private static final String sikhomeEnv = System.getenv("SIKULI_HOME");
   private static final String sikhomeProp = System.getProperty("sikuli.Home");
   public static final String libSub = slashify("SikuliX/libs", false);
+  private static String checkFileName;
 
 	/**
 	 * Mac: standard place for native libs
@@ -87,8 +87,18 @@ public class Settings {
 
     // check environmenet SIKULI_HOME
     if (libPath == null && sikhomeEnv != null) {
-      libspath = Settings.slashify(sikhomeEnv, true) + "libs";
-//TODO check if it is SikuliX-1.0
+      libspath = slashify(sikhomeEnv, true) + "libs";
+      if ((new File(libspath)).exists()) {
+//TODO this is a hack to check for the new SikuliX - find other solution
+        getOS();
+        if (checkFileName != null) {
+          if ((new File (slashify(libspath, true)+checkFileName+".txt")).exists() ||
+              (new File (slashify(libspath, true)+checkFileName+"32Bit.txt")).exists() ||
+              (new File (slashify(libspath, true)+checkFileName+"64Bit.txt")).exists()) {
+            libPath = libspath;
+          }
+        }
+      }
     }
 
     // check parent folder of jar file
@@ -291,13 +301,17 @@ public class Settings {
 
 	public static int getOS() {
 		int osRet = ISNOTSUPPORTED;
+    checkFileName = null;
 		String os = System.getProperty("os.name").toLowerCase();
 		if (os.startsWith("mac")) {
 			osRet = ISMAC;
+      checkFileName = "MadeForMac";
 		} else if (os.startsWith("windows")) {
 			osRet = ISWINDOWS;
+      checkFileName = "MadeForWindows";
 		} else if (os.startsWith("linux")) {
 			osRet = ISLINUX;
+      checkFileName = "MadeForLinux";
 		}
 		return osRet;
 	}
