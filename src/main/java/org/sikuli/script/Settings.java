@@ -8,6 +8,7 @@ package org.sikuli.script;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.security.CodeSource;
 import java.util.Date;
 import java.util.Properties;
 import org.sikuli.system.OSUtil;
@@ -24,7 +25,7 @@ public class Settings {
 	/**
 	 * Mac: standard place for native libs
 	 */
-	public static String libPathMac = "/Applications/SikuliX.app/Contents/libs";
+	public static String libPathMac = "/Applications/SikuliX-IDE.app/Contents/libs";
 
   /**
 	 * Win: standard place for native libs
@@ -71,13 +72,42 @@ public class Settings {
   public static String SikuliVersionIDE;
 
 	static {
-    Properties props = System.getProperties();
+    doDebug = false;
+    File libsfolder;
+    String libspath;
+    //Properties props = System.getProperties(); //for debugging
+
+    // check Java property sikuli.home
     if (sikhomeProp != null) {
-      libPath = slashify(sikhomeProp, true) + "libs";
-    } else if (sikhomeEnv != null) {
-      libPath = Settings.slashify(sikhomeEnv, true) + "libs";
+      libspath = (new File(slashify(sikhomeProp, true) + "libs")).getAbsolutePath();
+      if ((new File(libspath)).exists()) {
+        libPath = libspath;
+      }
     }
 
+    // check environmenet SIKULI_HOME
+    if (libPath == null && sikhomeEnv != null) {
+      libspath = Settings.slashify(sikhomeEnv, true) + "libs";
+//TODO check if it is SikuliX-1.0
+    }
+
+    // check parent folder of jar file
+    if (libPath == null) {
+      CodeSource src = Settings.class.getProtectionDomain().getCodeSource();
+      if (src != null) {
+        String srcParent = (new File(src.getLocation().getPath())).getParent();
+        db("jar Location: "+srcParent);
+        libsfolder = (new File(srcParent, "libs"));
+        if (libsfolder.exists()) {
+          db("folder libs found in jar parent folder");
+          libPath = libsfolder.getAbsolutePath();
+        } else {
+          db("no folder libs in jar parent folder");
+        }
+      }
+    }
+
+    // check the working directory and its parent
     if (libPath == null) {
       File wd = new File(System.getProperty("user.dir"));
       File wdp = new File(System.getProperty("user.dir")).getParentFile();
@@ -96,6 +126,7 @@ public class Settings {
       }
     }
 
+    // check Mac specific folders
     if (isMac() && libPath == null) {
       if (!(new File(libPathMac)).exists()) {
         libPath = slashify("/Applications/" + libSub, true);
@@ -104,6 +135,7 @@ public class Settings {
       }
     }
 
+    // check Windows specific folders
     if (isWindows() && libPath == null) {
       if ((new File(libPathWin)).exists()) {
         libPath = libPathWin;
@@ -112,7 +144,10 @@ public class Settings {
       }
     }
 
+    // TODO check existence of an extension repository
     SikuliRepo = null;
+
+    // set the folder that should contain tessdata
 		if (isWindows()) {
 			OcrDataPath = libPathWin;
 		} else if (isMac()) {
@@ -120,6 +155,8 @@ public class Settings {
 		} else {
 			OcrDataPath = "/usr/local/share";
 		}
+
+    // set the version strings
     if (SikuliVersionBetaN > 0) {
       SikuliVersion = SikuliVersionBeta;
       SikuliVersionIDE = SikuliVersionBetaIDE;
@@ -128,6 +165,13 @@ public class Settings {
       SikuliVersionIDE = SikuliVersionDefaultIDE;
   	}
 	}
+
+  private static boolean doDebug;
+  private static void db(String msg) {
+    if (doDebug) {
+      System.out.println("[Settings] "+msg);
+    }
+  }
 
 	public static final int ISWINDOWS = 0;
 	public static final int ISMAC = 1;
