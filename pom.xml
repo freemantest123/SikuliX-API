@@ -269,7 +269,7 @@
 				</executions>
 			</plugin>
 
-			<!-- Plugin to create an executable jar
+			<!-- Plugin to create an executable jar -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -282,7 +282,6 @@
 					</archive>
 				</configuration>
 			</plugin>
-      -->
 
 <!-- seems doubled to above <resources>
       <plugin>
