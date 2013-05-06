@@ -6,89 +6,143 @@
  */
 package org.sikuli.script;
 
-import java.awt.AWTException;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
 import javax.swing.JOptionPane;
 
 import org.apache.commons.cli.CommandLine;
-import org.sikuli.scriptrunner.JythonScriptRunner;
 
+/**
+ * Contains the main class
+ */
 public class SikuliScript {
 
-    private static CommandLine cmdLine;
-    public static boolean runningInteractive = false;
+    /**
+     * The ScriptRunner that is used to execute the script.
+     */
+    private static IScriptRunner runner = null;
 
-    public SikuliScript() throws AWTException {
+    /**
+     * Finds a ScriptRunner implementation to execute the script.
+     * @param name Name of the ScriptRunner, if more than one runner is available. If there is only one ScriptRunner available, this parameter can be null.
+     * @return The found ScriptRunner. If none or <b> more than one </b> matching ScriptRunner is found, null is returned.
+     */
+    private static IScriptRunner getScriptRunner(String name) {
+        ServiceLoader<IScriptRunner> loader = ServiceLoader.load(IScriptRunner.class);
+
+        Iterator<IScriptRunner> scriptRunnerIterator = loader.iterator();
+
+        while (scriptRunnerIterator.hasNext()) {
+            IScriptRunner currentRunner = scriptRunnerIterator.next();
+
+            // if there is a name, return the runner with the matching name
+            if (name != null && currentRunner.getName().toLowerCase().equals(name.toLowerCase())) {
+                return currentRunner;
+            }
+            // no name and/or no match, runner is saved temporary
+            if (runner == null) {
+                runner = currentRunner;
+            } else {
+                // more than one ScriptRunner was found, but names didn't match, null is returned because we cannot decide which one to use
+                return null;
+            }
+        }
+        return runner;
     }
 
+    /**
+     * Main method
+     * @param args passed arguments
+     */
     public static void main(String[] args) {
-        int exitCode = 0;
 
         Settings.showJavaInfo();
 
         CommandArgs cmdArgs = new CommandArgs("SCRIPT");
-        cmdLine = cmdArgs.getCommandLine(args);
+        CommandLine cmdLine = cmdArgs.getCommandLine(args);
 
-        //TODO downward compatibel
-        if (args.length > 0 && !args[0].startsWith("-")) {
-            String[] pyargs = CommandArgs.getPyArgs(cmdLine);
-            if (! pyargs[0].endsWith(".sikuli") && ! pyargs[0].endsWith(".skl")) {
-                Debug.error("No runnable script found: " + pyargs[0]);
-                exitCode = -2;
-            } else {
-                IScriptRunner runner = JythonScriptRunner.getInstance(pyargs);
-                exitCode = runner.run(null);
-            }
-            Debug.info("You are using deprecated command line argument syntax!");
-            if (Settings.InfoLogs) {
-                cmdArgs.printHelp();
-            }
+        IScriptRunner runner = null;
+
+        if (cmdLine != null) { // Load the specified scriptrunner if possible
+            runner = getScriptRunner(cmdLine.getOptionValue(CommandArgsEnum.SCRIPTRUNNER.longname()));
+        }
+
+        if (runner == null) { // Check if a scriptrunner could be loaded
+            Debug.error("None or more than one ScriptRunner found! Please check if a ScriptRunner is available and specify the ScriptRunner if more than one is available.");
+            System.exit(1);
+        }
+
+        runner.init(args); // init scriptrunner
+
+        if (cmdLine == null) { // check if any commandline args were loaded and print std help and runner specific help
+            Debug.error("Nothing to do! No valid arguments on commandline!");
+            cmdArgs.printHelp();
+            System.out.println(runner.getCommandLineHelp());
+            System.exit(1);
+        }
+
+        // print help
+        if (cmdLine.hasOption(CommandArgsEnum.HELP.shortname())) {
+            cmdArgs.printHelp();
+            System.out.println(runner.getCommandLineHelp());
+            System.exit(1);
+        }
+
+        // start interactive session
+        if (cmdLine.hasOption(CommandArgsEnum.INTERACTIVE.shortname())) {
+            int exitCode = runner.runInteractive(cmdLine.getOptionValues(CommandArgsEnum.ARGS.longname()));
+            runner.close();
             System.exit(exitCode);
         }
 
-        if (cmdLine != null) {
-            if (cmdLine.hasOption("h")) {
-                cmdArgs.printHelp();
-                return;
+        // start script execution
+        if (cmdLine.hasOption(CommandArgsEnum.RUN.shortname())) {
+            File runFile = new File(cmdLine.getOptionValue(CommandArgsEnum.RUN.longname()));
+            if (!runFile.exists() || (runFile.isDirectory() && !runFile.getName().endsWith(".sikuli"))) {
+                Debug.error("Script File "+runFile.getAbsolutePath()+" does not exist or is a directory but does not have a name ending with .sikuli");
+                System.exit(1);
             }
-            if (cmdLine.hasOption("i")) {
-                int exitcode = JythonScriptRunner.getInstance(new String[]{}).runInteractive(CommandArgs.getPyArgs(cmdLine));
-                System.exit(exitcode);
-            }
-            if (cmdLine.hasOption("run")) {
-                String [] pyParam = CommandArgs.getPyArgs(cmdLine);
-                String[] param = new String[pyParam.length + 1];
-                System.arraycopy(pyParam, 0, param, 0, pyParam.length);
-                param[param.length - 1] = "SCRIPT";
 
-                IScriptRunner runner = JythonScriptRunner.getInstance(param);
-                exitCode = runner.run(null);
-                System.exit(exitCode);
-            } else if (cmdLine.hasOption("test")) {
-                Debug.error("Sorry, support for option -t (test) not yet available - use X-1.0rc3");
-                System.exit(-2);
-            }
+            File imagePath = resolveImagePath(runFile);
+            ImageLocator.setBundlePath(imagePath.getAbsolutePath());
+
+            int exitCode = runner.runScript(runFile, imagePath, cmdLine.getOptionValues(CommandArgsEnum.ARGS.longname()));
+            runner.close();
+            System.exit(exitCode);
         }
-        Debug.error("Nothing to do! No valid arguments on commandline!");
-        cmdArgs.printHelp();
+
+        // start script as testcase
+        if (cmdLine.hasOption(CommandArgsEnum.TEST.shortname())) {
+            File runFile = new File(cmdLine.getOptionValue(CommandArgsEnum.RUN.longname()));
+            if (!runFile.exists() || (runFile.isDirectory() && runFile.getName().endsWith(".sikuli"))) {
+                Debug.error("Script File does not exist or is a directory but does not have a name ending with .sikuli");
+                System.exit(1);
+            }
+
+            File imagePath = resolveImagePath(runFile);
+            ImageLocator.setBundlePath(imagePath.getAbsolutePath());
+
+            int exitCode = runner.runTest(runFile, resolveImagePath(runFile), cmdLine.getOptionValues(CommandArgsEnum.ARGS.longname()));
+            runner.close();
+            System.exit(exitCode);
+        }
     }
 
-    public static void shelp() {
-        if (SikuliScript.runningInteractive) {
-            System.out.println("**** this might be helpful ****");
-            System.out.println(
-                    "-- execute a line of code by pressing <enter>\n" +
-                            "-- separate more than one statement on a line using ;\n" +
-                            "-- Unlike the iDE, this command window will not vanish, when using a Sikuli feature\n" +
-                            "   so take care, that all you need is visible on the screen\n" +
-                            "-- to create an image interactively:\n" +
-                            "img = capture()\n" +
-                            "-- use a captured image later:\n" +
-                            "click(img)"
-                    );
+    /**
+     * Returns the directory that contains the images used by the ScriptRunner.
+     * @param scriptFile The file containing the script.
+     * @return The directory containing the images.
+     */
+    public static File resolveImagePath(File scriptFile) {
+        if (!scriptFile.isDirectory()) {
+            return scriptFile.getParentFile();
         }
+
+        return scriptFile;
     }
 
     public static void setShowActions(boolean flag) {
@@ -150,5 +204,12 @@ public class SikuliScript {
             err.printStackTrace();
         }
         return lines;
+    }
+
+    /**
+     * Prints the interactive help from the ScriptRunner.
+     */
+    public static void shelp() {
+        System.out.println(runner.getInteractiveHelp());
     }
 }

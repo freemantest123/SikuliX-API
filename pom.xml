@@ -148,12 +148,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.python</groupId>
-            <artifactId>jython-standalone</artifactId>
-            <version>2.5.4-rc1</version>
-        </dependency>
-
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.0</version>
@@ -290,7 +284,7 @@
             </plugin>
       -->
 
-      <!-- This plugin is needed to include additional java source directories for compilation -->
+      <!-- This plugin is needed to include additional java source directories for compilation 
       <plugin>
           <groupId>org.codehaus.mojo</groupId>
               <artifactId>build-helper-maven-plugin</artifactId>
@@ -309,7 +303,7 @@
                       </configuration>
                   </execution>
               </executions>
-            </plugin>
+            </plugin> -->
         </plugins>
     </build>
 </project>
