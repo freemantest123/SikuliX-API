@@ -6,159 +6,210 @@
  */
 package org.sikuli.script;
 
-import java.awt.*;
-import java.io.*;
-import javax.swing.*;
-import org.apache.commons.cli.CommandLine;
-import org.python.util.jython;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.ServiceLoader;
 
+import javax.swing.JOptionPane;
+
+import org.apache.commons.cli.CommandLine;
+
+/**
+ * Contains the main class
+ */
 public class SikuliScript {
 
-  private static CommandLine cmdLine;
-	public static boolean runningInteractive = false;
+    /**
+     * The ScriptRunner that is used to execute the script.
+     */
+    private static IScriptRunner runner = null;
 
-  public SikuliScript() throws AWTException {
-  }
+    /**
+     * Finds a ScriptRunner implementation to execute the script.
+     * @param name Name of the ScriptRunner, if more than one runner is available. If there is only one ScriptRunner available, this parameter can be null.
+     * @return The found ScriptRunner. If none or <b> more than one </b> matching ScriptRunner is found, null is returned.
+     */
+    private static IScriptRunner getScriptRunner(String name) {
+        ServiceLoader<IScriptRunner> loader = ServiceLoader.load(IScriptRunner.class);
 
-  public static void main(String[] args) {
-    int exitCode = 0;
+        Iterator<IScriptRunner> scriptRunnerIterator = loader.iterator();
 
-    Settings.showJavaInfo();
+        while (scriptRunnerIterator.hasNext()) {
+            IScriptRunner currentRunner = scriptRunnerIterator.next();
 
-    CommandArgs cmdArgs = new CommandArgs("SCRIPT");
-    cmdLine = cmdArgs.getCommandLine(args);
-
-    //TODO downward compatibel
-    if (args.length > 0 && !args[0].startsWith("-")) {
-			String[] pyargs = CommandArgs.getPyArgs(cmdLine);
-			if (! pyargs[0].endsWith(".sikuli") && ! pyargs[0].endsWith(".skl")) {
-				Debug.error("No runnable script found: " + pyargs[0]);
-				exitCode = -2;
-			} else{
-				SikuliScriptRunner runner = new SikuliScriptRunner(pyargs);
-				exitCode = runner.runPython(null);
-			}
-      Debug.info("You are using deprecated command line argument syntax!");
-      if (Settings.InfoLogs) {
-        cmdArgs.printHelp();
-      }
-      System.exit(exitCode);
+            // if there is a name, return the runner with the matching name
+            if (name != null && currentRunner.getName().toLowerCase().equals(name.toLowerCase())) {
+                return currentRunner;
+            }
+            // no name and/or no match, runner is saved temporary
+            if (runner == null) {
+                runner = currentRunner;
+            } else {
+                // more than one ScriptRunner was found, but names didn't match, null is returned because we cannot decide which one to use
+                return null;
+            }
+        }
+        return runner;
     }
 
-    if (cmdLine != null) {
-      if (cmdLine.hasOption("h")) {
-        cmdArgs.printHelp();
-        return;
-      }
-      if (cmdLine.hasOption("i")) {
-        String[] sargs = CommandArgs.getPyArgs(cmdLine);
-        String[] jy_args = null;
-        String[] iargs = {"-i", "-c",
-          ""
-//					+ "import sys; print sys.path; "
-          + "from sikuli import *; SikuliScript.runningInteractive = True; "
-					+ "print \"Hello, this is your interactive Sikuli (rules for interactive Python apply)\\n"
-					+ "use the UP/DOWN arrow keys to walk through the input history\\n"
-					+ "help()<enter> will output some basic Python information\\n"
-					+ "shelp()<enter> will output some basic Sikuli information\\n"
-					+ "... use ctrl-d to end the session\""};
-        if (sargs.length > 0) {
-          jy_args = new String[sargs.length + iargs.length];
-          System.arraycopy(iargs, 0, jy_args, 0, iargs.length);
-          System.arraycopy(sargs, 0, jy_args, iargs.length, sargs.length);
-        } else {
-          jy_args = iargs;
+    /**
+     * Main method
+     * @param args passed arguments
+     */
+    public static void main(String[] args) {
+
+        Settings.showJavaInfo();
+
+        CommandArgs cmdArgs = new CommandArgs("SCRIPT");
+        CommandLine cmdLine = cmdArgs.getCommandLine(args);
+
+        IScriptRunner runner = null;
+
+        if (cmdLine != null) { // Load the specified scriptrunner if possible
+            runner = getScriptRunner(cmdLine.getOptionValue(CommandArgsEnum.SCRIPTRUNNER.longname()));
         }
 
-				jython.main(jy_args);
-        return;
-      }
-      if (cmdLine.hasOption("run")) {
-        SikuliScriptRunner runner = new SikuliScriptRunner(CommandArgs.getPyArgs(cmdLine), "SCRIPT");
-        System.exit(runner.runPython(null));
-      } else if (cmdLine.hasOption("test")) {
-				Debug.error("Sorry, support for option -t (test) not yet available - use X-1.0rc3");
-	      System.exit(-2);
-			}
-		}
-		Debug.error("Nothing to do! No valid arguments on commandline!");
-		cmdArgs.printHelp();
-  }
+        if (runner == null) { // Check if a scriptrunner could be loaded
+            Debug.error("None or more than one ScriptRunner found! Please check if a ScriptRunner is available and specify the ScriptRunner if more than one is available.");
+            System.exit(1);
+        }
 
-  public static void shelp() {
-		if (SikuliScript.runningInteractive) {
-			System.out.println("**** this might be helpful ****");
-			System.out.println(
-				"-- execute a line of code by pressing <enter>\n" +
-				"-- separate more than one statement on a line using ;\n" +
-				"-- Unlike the iDE, this command window will not vanish, when using a Sikuli feature\n" +
-				"   so take care, that all you need is visible on the screen\n" +
-				"-- to create an image interactively:\n" +
-				"img = capture()\n" +
-				"-- use a captured image later:\n" +
-				"click(img)"
-				);
-		}
-	}
+        runner.init(args); // init scriptrunner
 
-	public static void setShowActions(boolean flag) {
-    Settings.ShowActions = flag;
-    if (flag) {
-      if (Settings.MoveMouseDelay < 1f) {
-        Settings.MoveMouseDelay = 1f;
-      }
+        if (cmdLine == null) { // check if any commandline args were loaded and print std help and runner specific help
+            Debug.error("Nothing to do! No valid arguments on commandline!");
+            cmdArgs.printHelp();
+            System.out.println(runner.getCommandLineHelp());
+            System.exit(1);
+        }
+
+        // print help
+        if (cmdLine.hasOption(CommandArgsEnum.HELP.shortname())) {
+            cmdArgs.printHelp();
+            System.out.println(runner.getCommandLineHelp());
+            System.exit(1);
+        }
+
+        // start interactive session
+        if (cmdLine.hasOption(CommandArgsEnum.INTERACTIVE.shortname())) {
+            int exitCode = runner.runInteractive(cmdLine.getOptionValues(CommandArgsEnum.ARGS.longname()));
+            runner.close();
+            System.exit(exitCode);
+        }
+
+        // start script execution
+        if (cmdLine.hasOption(CommandArgsEnum.RUN.shortname())) {
+            File runFile = new File(cmdLine.getOptionValue(CommandArgsEnum.RUN.longname()));
+            if (!runFile.exists() || (runFile.isDirectory() && !runFile.getName().endsWith(".sikuli"))) {
+                Debug.error("Script File "+runFile.getAbsolutePath()+" does not exist or is a directory but does not have a name ending with .sikuli");
+                System.exit(1);
+            }
+
+            File imagePath = resolveImagePath(runFile);
+            ImageLocator.setBundlePath(imagePath.getAbsolutePath());
+
+            int exitCode = runner.runScript(runFile, imagePath, cmdLine.getOptionValues(CommandArgsEnum.ARGS.longname()));
+            runner.close();
+            System.exit(exitCode);
+        }
+
+        // start script as testcase
+        if (cmdLine.hasOption(CommandArgsEnum.TEST.shortname())) {
+            File runFile = new File(cmdLine.getOptionValue(CommandArgsEnum.RUN.longname()));
+            if (!runFile.exists() || (runFile.isDirectory() && runFile.getName().endsWith(".sikuli"))) {
+                Debug.error("Script File does not exist or is a directory but does not have a name ending with .sikuli");
+                System.exit(1);
+            }
+
+            File imagePath = resolveImagePath(runFile);
+            ImageLocator.setBundlePath(imagePath.getAbsolutePath());
+
+            int exitCode = runner.runTest(runFile, resolveImagePath(runFile), cmdLine.getOptionValues(CommandArgsEnum.ARGS.longname()));
+            runner.close();
+            System.exit(exitCode);
+        }
     }
-  }
 
-  public static String input(String msg) {
-    return (String) JOptionPane.showInputDialog(msg);
-  }
+    /**
+     * Returns the directory that contains the images used by the ScriptRunner.
+     * @param scriptFile The file containing the script.
+     * @return The directory containing the images.
+     */
+    public static File resolveImagePath(File scriptFile) {
+        if (!scriptFile.isDirectory()) {
+            return scriptFile.getParentFile();
+        }
 
-  public static String input(String msg, String preset) {
-    return (String) JOptionPane.showInputDialog(msg, preset);
-  }
-
-  public static int switchApp(String appName) {
-    if (App.focus(appName) != null) {
-      return 0;
+        return scriptFile;
     }
-    return -1;
-  }
 
-  public static int openApp(String appName) {
-    if (App.open(appName) != null) {
-      return 0;
+    public static void setShowActions(boolean flag) {
+        Settings.ShowActions = flag;
+        if (flag) {
+            if (Settings.MoveMouseDelay < 1f) {
+                Settings.MoveMouseDelay = 1f;
+            }
+        }
     }
-    return -1;
-  }
 
-  public static int closeApp(String appName) {
-    return App.close(appName);
-  }
-
-  public static void popup(String message, String title) {
-    JOptionPane.showMessageDialog(null, message,
-            title, JOptionPane.PLAIN_MESSAGE);
-  }
-
-  public static void popup(String message) {
-    popup(message, "Sikuli");
-  }
-
-  public static String run(String cmdline) {
-//TODO: improve run command
-    String lines = "";
-    try {
-      String line;
-      Process p = Runtime.getRuntime().exec(cmdline);
-      BufferedReader input =
-              new BufferedReader(new InputStreamReader(p.getInputStream()));
-      while ((line = input.readLine()) != null) {
-        lines = lines + '\n' + line;
-      }
-    } catch (Exception err) {
-      err.printStackTrace();
+    public static String input(String msg) {
+        return JOptionPane.showInputDialog(msg);
     }
-    return lines;
-  }
+
+    public static String input(String msg, String preset) {
+        return JOptionPane.showInputDialog(msg, preset);
+    }
+
+    public static int switchApp(String appName) {
+        if (App.focus(appName) != null) {
+            return 0;
+        }
+        return -1;
+    }
+
+    public static int openApp(String appName) {
+        if (App.open(appName) != null) {
+            return 0;
+        }
+        return -1;
+    }
+
+    public static int closeApp(String appName) {
+        return App.close(appName);
+    }
+
+    public static void popup(String message, String title) {
+        JOptionPane.showMessageDialog(null, message,
+                title, JOptionPane.PLAIN_MESSAGE);
+    }
+
+    public static void popup(String message) {
+        popup(message, "Sikuli");
+    }
+
+    public static String run(String cmdline) {
+        //TODO: improve run command
+        String lines = "";
+        try {
+            String line;
+            Process p = Runtime.getRuntime().exec(cmdline);
+            BufferedReader input =
+                    new BufferedReader(new InputStreamReader(p.getInputStream()));
+            while ((line = input.readLine()) != null) {
+                lines = lines + '\n' + line;
+            }
+        } catch (Exception err) {
+            err.printStackTrace();
+        }
+        return lines;
+    }
+
+    /**
+     * Prints the interactive help from the ScriptRunner.
+     */
+    public static void shelp() {
+        System.out.println(runner.getInteractiveHelp());
+    }
 }
