@@ -19,7 +19,7 @@ public class Settings {
   public static String libPath = null;
   private static final String sikhomeEnv = System.getenv("SIKULI_HOME");
   private static final String sikhomeProp = System.getProperty("sikuli.Home");
-  public static final String libSub = slashify("SikuliX/libs", false);
+  public static final String libSub = FileManager.slashify("SikuliX/libs", false);
   private static String checkFileName;
 
 	/**
@@ -30,8 +30,8 @@ public class Settings {
   /**
 	 * Win: standard place for native libs
 	 */
-	public static final String libPathWin = slashify(System.getenv("ProgramFiles"), true)+libSub;
-	public static final String libPathWin32 = slashify(System.getenv("ProgramFiles(x86)"), true)+libSub;
+	public static final String libPathWin = FileManager.slashify(System.getenv("ProgramFiles"), true)+libSub;
+	public static final String libPathWin32 = FileManager.slashify(System.getenv("ProgramFiles(x86)"), true)+libSub;
 
   /**
 	 * location of folder Tessdata
@@ -79,7 +79,7 @@ public class Settings {
 
     // check Java property sikuli.home
     if (sikhomeProp != null) {
-      libspath = (new File(slashify(sikhomeProp, true) + "libs")).getAbsolutePath();
+      libspath = (new File(FileManager.slashify(sikhomeProp, true) + "libs")).getAbsolutePath();
       if ((new File(libspath)).exists()) {
         libPath = libspath;
       }
@@ -87,14 +87,14 @@ public class Settings {
 
     // check environmenet SIKULI_HOME
     if (libPath == null && sikhomeEnv != null) {
-      libspath = slashify(sikhomeEnv, true) + "libs";
+      libspath = FileManager.slashify(sikhomeEnv, true) + "libs";
       if ((new File(libspath)).exists()) {
 //TODO this is a hack to check for the new SikuliX - find other solution
         getOS();
         if (checkFileName != null) {
-          if ((new File (slashify(libspath, true)+checkFileName+".txt")).exists() ||
-              (new File (slashify(libspath, true)+checkFileName+"32Bit.txt")).exists() ||
-              (new File (slashify(libspath, true)+checkFileName+"64Bit.txt")).exists()) {
+          if ((new File (FileManager.slashify(libspath, true)+checkFileName+".txt")).exists() ||
+              (new File (FileManager.slashify(libspath, true)+checkFileName+"32Bit.txt")).exists() ||
+              (new File (FileManager.slashify(libspath, true)+checkFileName+"64Bit.txt")).exists()) {
             libPath = libspath;
           }
         }
@@ -121,15 +121,15 @@ public class Settings {
     if (libPath == null) {
       File wd = new File(System.getProperty("user.dir"));
       File wdp = new File(System.getProperty("user.dir")).getParentFile();
-      wd = new File(slashify(wd.getAbsolutePath(), true) + libSub);
-      wdp = new File(slashify(wdp.getAbsolutePath(), true) + libSub);
+      wd = new File(FileManager.slashify(wd.getAbsolutePath(), true) + libSub);
+      wdp = new File(FileManager.slashify(wdp.getAbsolutePath(), true) + libSub);
       if (wd.exists()) {
         libPath = wd.getAbsolutePath();
       } else if (wdp.exists()) {
         libPath = wdp.getAbsolutePath();
       }
       if (libPath == null) {
-        wd = new File(slashify(System.getProperty("user.home"), true) + libSub);
+        wd = new File(FileManager.slashify(System.getProperty("user.home"), true) + libSub);
         if (wd.exists()) {
           libPath = wd.getAbsolutePath();
         }
@@ -139,7 +139,7 @@ public class Settings {
     // check Mac specific folders
     if (isMac() && libPath == null) {
       if (!(new File(libPathMac)).exists()) {
-        libPath = slashify("/Applications/" + libSub, true);
+        libPath = FileManager.slashify("/Applications/" + libSub, true);
       } else {
         libPath = libPathMac;
       }
@@ -363,22 +363,6 @@ public class Settings {
 		}
 		return osUtil;
 	}
-
-  public static String slashify(String path, boolean isDirectory) {
-    String p;
-    if (path == null) {
-      p = "";
-    } else {
-      p = path;
-      if (File.separatorChar != '/') {
-        p = p.replace(File.separatorChar, '/');
-      }
-      if (!p.endsWith("/") && isDirectory) {
-        p = p + "/";
-      }
-    }
-    return p;
-  }
 
   public static void setArgs(String[] args) {
     Settings.args = args;

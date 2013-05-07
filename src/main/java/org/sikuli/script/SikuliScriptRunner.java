@@ -88,7 +88,7 @@ public class SikuliScriptRunner {
 
 	public int runPython(String bundlePath) {
 		if (bundlePath == null) {
-			bundlePath = sysargv.get(0);
+			bundlePath = FileManager.slashify(sysargv.get(0), false);
 			if (bundlePath.endsWith(".skl")) {
 				String f = FileManager.unzipSKL(bundlePath);
 				if (f != null) {
@@ -136,17 +136,17 @@ public class SikuliScriptRunner {
 
 		// where the java command is run
 		addTempHeader("addModPath(\""
-						+ Settings.slashify(System.getProperty("user.dir"), true) + "\")");
+						+ FileManager.slashify(System.getProperty("user.dir"), true) + "\")");
 
 		// the script directory ..../foobar.sikuli
 		addTempHeader("addModPath(\""
-						+ Settings.slashify(bundlePath, true) + "\")");
+						+ FileManager.slashify(bundlePath, true) + "\")");
 
 		// the directory whre the .sikuli is located
 		String parent =  (new File(bundlePath)).getParent();
 		if (parent != null) {
 			addTempHeader("addModPath(\""
-							+ Settings.slashify(parent, true) + "\")");
+							+ FileManager.slashify(parent, true) + "\")");
 		}
 
 		addTempHeader("sys.argv = ['' for i in range(" + sysargv.size() + ")]");

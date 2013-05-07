@@ -36,7 +36,6 @@ public class FileManager {
 
   static {
     cl = FileManager.class.getClassLoader();
-    libPaths.add(Settings.libPath);
     //TODO extractLibs();
   }
 
@@ -56,6 +55,9 @@ public class FileManager {
    * @throws IOException
    */
   public static void loadLibrary(String libname) {
+    if (libPaths.size() == 0) {
+      libPaths.add(Settings.libPath);
+    }
     File lib = null;
     boolean libFound = false;
     try {
@@ -550,5 +552,25 @@ public class FileManager {
   public static String getName(String filename) {
     File f = new File(filename);
     return f.getName();
+  }
+
+  public static String slashify(String path, boolean isDirectory) {
+    String p;
+    if (path == null) {
+      p = "";
+    } else {
+      p = path;
+      if (File.separatorChar != '/') {
+        p = p.replace(File.separatorChar, '/');
+      }
+      if (isDirectory) {
+        if (!p.endsWith("/")) {
+          p = p + "/";
+        }
+      } else if (p.endsWith("/")) {
+        p = p.substring(0, p.length() - 1);
+      }
+    }
+    return p;
   }
 }
