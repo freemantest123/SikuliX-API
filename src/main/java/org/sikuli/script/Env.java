@@ -18,7 +18,7 @@ import org.sikuli.system.OSUtil;
 public class Env {
 
   /**
-   * @deprecated use Settings.getVersion() instaed
+   * @deprecated use Settings.getVersion() instead
    */
   @Deprecated
   public static String SikuliVersion = Settings.SikuliVersion;
@@ -45,7 +45,7 @@ public class Env {
   /**
    * @return current Location
    * @throws HeadlessException
-   * @deprecated use Region. ... instaed
+   * @deprecated use Region.atMouse() ... instead
    */
   @Deprecated
   public static Location getMouseLocation() throws HeadlessException {
@@ -86,7 +86,7 @@ public class Env {
 
   /**
    * @return true/false
-   * @deprecated use Settings. ... instaed
+   * @deprecated use Settings. ... instead
    */
   @Deprecated
   public static boolean isWindows() {
@@ -95,7 +95,7 @@ public class Env {
 
   /**
    * @return true/false
-   * @deprecated use Settings. ... instaed
+   * @deprecated use Settings. ... instead
    */
   @Deprecated
   public static boolean isLinux() {
@@ -104,7 +104,7 @@ public class Env {
 
   /**
    * @return true/false
-   * @deprecated use Settings. ... instaed
+   * @deprecated use Settings. ... instead
    */
   @Deprecated
   public static boolean isMac() {
@@ -113,7 +113,7 @@ public class Env {
 
   /**
    * @return path seperator : or ;
-   * @deprecated use Settings. ... instaed
+   * @deprecated use Settings.getPathSeparator() ... instead
    */
   @Deprecated
   public static String getSeparator() {
