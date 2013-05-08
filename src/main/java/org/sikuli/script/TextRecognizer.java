@@ -33,7 +33,7 @@ public class TextRecognizer {
   public void init() {
     String path;
     File fpath;
-    path = Settings.slashify(Settings.OcrDataPath, true);
+    path = FileManager.slashify(Settings.OcrDataPath, true);
     fpath = new File(path, "tessdata");
     if (!fpath.exists()) {
       Settings.OcrDataPath = null;
@@ -42,7 +42,7 @@ public class TextRecognizer {
       Settings.OcrTextSearch = false;
     } else {
       Debug.log(2, "OCR data path: " + path);
-      Vision.initOCR(Settings.slashify(Settings.OcrDataPath, true));
+      Vision.initOCR(FileManager.slashify(Settings.OcrDataPath, true));
       _init_succeeded = true;
       Debug.log(2, "TextRecognizer: inited.");
     }

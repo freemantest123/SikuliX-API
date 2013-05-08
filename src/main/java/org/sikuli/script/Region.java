@@ -2640,9 +2640,14 @@ public class Region {
    * @return 1 if possible, 0 otherwise
    */
   public int type(String text, String modifiers) {
+    String target = null;
     int modifiersNew = Key.convertModifiers(modifiers);
+    if (modifiersNew == 0) {
+      target = text;
+      text = modifiers;
+    }
     try {
-      return keyin(null, text, modifiersNew);
+      return keyin(target, text, modifiersNew);
     } catch (FindFailed findFailed) {
       return 0;
     }

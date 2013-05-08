@@ -51,7 +51,7 @@ public class Debug {
     logfile = System.getProperty("sikuli.Logfile");
     if (logfile != null) {
       if ("".equals(logfile)) {
-        logfile = Settings.slashify(System.getProperty("user.dir"), true) + "SikuliLog.txt";
+        logfile = FileManager.slashify(System.getProperty("user.dir"), true) + "SikuliLog.txt";
       }
       try {
         printout = new PrintStream(logfile);
@@ -63,7 +63,7 @@ public class Debug {
     logfileuser = System.getProperty("sikuli.LogfileUser");
     if (logfileuser != null) {
       if ("".equals(logfileuser)) {
-        logfileuser = Settings.slashify(System.getProperty("user.dir"), true) + "UserLog.txt";
+        logfileuser = FileManager.slashify(System.getProperty("user.dir"), true) + "UserLog.txt";
       }
       try {
         printoutuser = new PrintStream(logfileuser);

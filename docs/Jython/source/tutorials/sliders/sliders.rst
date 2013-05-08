@@ -56,7 +56,7 @@ coordinates to explicitly drag to the left, as shown below.
 
 .. sikulicode::
 
-	dragDrop(t, [t.x - 200, t.y])
+	dragDrop(t, Location(t.x - 200, t.y))
 
 Here, the (x,y) coordinates of the slider thumb are accessible as the attributes of
 t. We can thus calculate the position 200 pixels to the left of t and ask Sikuli

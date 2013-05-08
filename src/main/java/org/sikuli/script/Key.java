@@ -389,18 +389,20 @@ public class Key {
 
   protected static int convertModifiers(String mod) {
     int modNew = 0;
+    char key;
     for (int i = 0; i < mod.length(); i++) {
-      if (Key.CTRL.equals(mod.substring(i))) {
+      key = mod.charAt(i);
+      if (Key.C_CTRL == key) {
         modNew |= KeyModifier.CTRL;
-      } else if (Key.ALT.equals(mod.substring(i))) {
+      } else if (Key.C_ALT == key) {
         modNew |= KeyModifier.ALT;
-      } else if (Key.SHIFT.equals(mod.substring(i))) {
+      } else if (Key.C_SHIFT == key) {
         modNew |= KeyModifier.SHIFT;
-      } else if (Key.CMD.equals(mod.substring(i))) {
+      } else if (Key.C_CMD == key) {
         modNew |= KeyModifier.CMD;
-      } else if (Key.META.equals(mod.substring(i))) {
+      } else if (Key.C_META == key) {
         modNew |= KeyModifier.META;
-      } else if (Key.WIN.equals(mod.substring(i))) {
+      } else if (Key.C_WIN == key) {
         modNew |= KeyModifier.WIN;
       }
     }
