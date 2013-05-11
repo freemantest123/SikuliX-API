@@ -5,9 +5,6 @@
  */
 package org.sikuli.script;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -17,19 +14,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 public class CommandArgs {
-
-    public static String[] getPyArgs(CommandLine cl) {
-        ArrayList<String> pargs = new ArrayList<String>();
-        if (cl.hasOption("run")) {
-            pargs.add(cl.getOptionValue("run"));
-        }
-        if (cl.hasOption("args")) {
-            pargs.addAll(Arrays.asList(cl.getOptionValues("args")));
-        } else {
-            pargs.addAll(Arrays.asList(cl.getArgs()));
-        }
-        return pargs.toArray(new String[0]);
-    }
 
     Options _options;
     String _callerType;

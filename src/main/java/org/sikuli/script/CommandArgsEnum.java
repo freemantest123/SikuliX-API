@@ -8,13 +8,13 @@ public enum CommandArgsEnum {
     HELP("help", "h", null, "print this help message"),
 
     /** Starts an interactive session */
-    INTERACTIVE("interactive", "i", null, "start interactive Sikuli Jython session\n(Sikuli, sys, time already imported)"),
+    INTERACTIVE("interactive", "i", null, "start interactive Sikuli session with the available ScriptRunner"),
 
     /** Runs the script */
     RUN("run", "r", "foobar.sikuli", "run script"),
 
     /** Runs the script as testcase */
-    TEST("test", "t", "foobar.sikuli", "run script using Jython's unittest"),
+    TEST("test", "t", "foobar.sikuli", "runs a unittest with the available ScriptRunner"),
 
     /** Runs the script with the specified ScriptRunner */
     SCRIPTRUNNER("scriptrunner", null, "scriptrunner", "ScriptRunner that will execute the script"),
@@ -26,7 +26,7 @@ public enum CommandArgsEnum {
     LOAD("load", "l", "one or more foobar.sikuli", "peload scripts in IDE"),
 
     /** Arguments to be passed to the Script */
-    ARGS("args", null, "arguments", "arguments passed to Jython's sys.argv");
+    ARGS("args", null, "arguments", "arguments passed to the script as parameters");
 
     /** Longname of the parameter */
     private String longname;
