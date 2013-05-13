@@ -643,9 +643,7 @@ public class Region {
     /**
      *
      * @return x of top left corner
-     * @deprecated use region.x instead
      */
-    @Deprecated
     public int getX() {
         return x;
     }
@@ -653,9 +651,7 @@ public class Region {
     /**
      *
      * @return y of top left corner
-     * @deprecated use region.y instead
      */
-    @Deprecated
     public int getY() {
         return y;
     }
@@ -663,9 +659,7 @@ public class Region {
     /**
      *
      * @return width of region
-     * @deprecated use region.w instead
      */
-    @Deprecated
     public int getW() {
         return w;
     }
@@ -673,9 +667,7 @@ public class Region {
     /**
      *
      * @return height of region
-     * @deprecated use region.w instead
      */
-    @Deprecated
     public int getH() {
         return h;
     }
@@ -683,9 +675,7 @@ public class Region {
     /**
      *
      * @param X new x position of top left corner
-     * @deprecated use region.x= instead
      */
-    @Deprecated
     public void setX(int X) {
         x = X;
     }
@@ -693,9 +683,7 @@ public class Region {
     /**
      *
      * @param Y new y position of top left corner
-     * @deprecated use region.y= instead
      */
-    @Deprecated
     public void setY(int Y) {
         y = Y;
     }
@@ -703,9 +691,7 @@ public class Region {
     /**
      *
      * @param W new width
-     * @deprecated use region.w= instead
      */
-    @Deprecated
     public void setW(int W) {
         w = W;
     }
@@ -713,9 +699,7 @@ public class Region {
     /**
      *
      * @param H new height
-     * @deprecated use region.h instead
      */
-    @Deprecated
     public void setH(int H) {
         h = H;
     }
