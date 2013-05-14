@@ -52,7 +52,7 @@ public class ComparatorTest {
     }
 
     /**
-     * Test the {@link VerticalComparator}.
+     * Test the {@link DistanceComparator}.
      */
     @Test
     public void testDistanceComparator() {
