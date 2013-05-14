@@ -10,9 +10,12 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.security.CodeSource;
 import java.util.Date;
+import java.util.Properties;
 import org.sikuli.system.OSUtil;
 
 public class Settings {
+
+  public static String UserName = "UnKnown";
 
   public static boolean makeJythonRegion = false;
   public static int breakPoint = 0;
@@ -71,13 +74,19 @@ public class Settings {
  	public static String SikuliVersionBetaIDE = SikuliVersionDefaultIDE + "-Beta" + SikuliVersionBetaN;
 	public static String SikuliVersion = "#sikuliversion#";
   public static String SikuliVersionIDE;
+  public static String BaseTempPath;
 
 //TODO move libs check to FileManager
 	static {
     doDebug = false;
     File libsfolder;
     String libspath;
-    //Properties props = System.getProperties(); //for debugging
+    Properties props = System.getProperties(); //for debugging
+
+    if (System.getProperty("user.name") != null && !"".equals(System.getProperty("user.name"))) {
+      UserName = System.getProperty("user.name");
+    }
+    BaseTempPath = System.getProperty("java.io.tmpdir") + File.separator + UserName;
 
     // check Java property sikuli.home
     if (sikhomeProp != null) {

@@ -21,7 +21,7 @@ public class ImageLocator {
 
 	static ArrayList<String> pathList = new ArrayList<String>();
 	static int firstEntries = 1;
-	static File _cache_dir_global = new File(System.getProperty("java.io.tmpdir"), "sikuli_cache/SIKULI_GLOBAL/");
+	static File _cache_dir_global = new File(Settings.BaseTempPath, "sikuli_cache/SIKULI_GLOBAL/");
 	static Map<URI, String> _cache = new HashMap<URI, String>();
 
 	static {

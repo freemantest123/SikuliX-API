@@ -34,6 +34,7 @@ public class FileManager {
   private static List<String> libsList = new ArrayList<String>();
   private static ClassLoader cl;
 
+
   static {
     cl = FileManager.class.getClassLoader();
     //TODO extractLibs();
@@ -155,7 +156,7 @@ public class FileManager {
           return jniDir;
         }
       }
-      String libTmpDir = System.getProperty("java.io.tmpdir") + "/tmplib";
+      String libTmpDir = Settings.BaseTempPath + File.separator + "tmplib";
       System.setProperty("java.library.tmpdir", libTmpDir);
       jniDir = new File(libTmpDir);
       Debug.log(2, "Initialised JNI library working directory to '" + jniDir + "'");
@@ -244,7 +245,7 @@ public class FileManager {
 	 */
 	public static String extract(String path) throws IOException {
 		InputStream in = cl.getResourceAsStream(path + "/filelist.txt");
-		String localPath = System.getProperty("java.io.tmpdir") + "/sikuli/" + path;
+		String localPath = Settings.BaseTempPath + File.separator + "sikuli" + File.separator + path;
 		new File(localPath).mkdirs();
 		Debug.log(4, "extract resources " + path + " to " + localPath);
 		writeFileList(in, path, localPath);
@@ -361,12 +362,10 @@ public class FileManager {
 	}
 
 	public static File createTempDir() {
-		final String baseTempPath = System.getProperty("java.io.tmpdir");
-
 		Random rand = new Random();
 		int randomInt = 1 + rand.nextInt();
 
-		File tempDir = new File(baseTempPath + File.separator + "tmp-" + randomInt + ".sikuli");
+		File tempDir = new File(Settings.BaseTempPath + File.separator + "tmp-" + randomInt + ".sikuli");
 		if (tempDir.exists() == false) {
 			tempDir.mkdir();
 		}
