@@ -250,6 +250,7 @@ public class Settings {
 	public static boolean InfoLogs = true;
 	public static boolean DebugLogs = false;
 	public static boolean ProfileLogs = false;
+	public static boolean LogTime = false;
 	public static boolean UserLogs = true;
 	public static String UserLogPrefix = "user";
 	public static boolean UserLogTime = true;
