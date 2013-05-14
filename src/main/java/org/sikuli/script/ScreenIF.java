@@ -1,8 +1,8 @@
 /*
- * Copyright 2010-2011, Sikuli.org
+ * Copyright 2010-2013, Sikuli.org
  * Released under the MIT License.
  *
- * modified 2012 RaiMan
+ * modified RaiMan 2013
  */
 package org.sikuli.script;
 

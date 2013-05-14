@@ -1,3 +1,9 @@
+/*
+ * Copyright 2010-2013, Sikuli.org
+ * Released under the MIT License.
+ *
+ * added Kelthuzad 2013
+ */
 package test;
 
 import static org.junit.Assert.assertEquals;

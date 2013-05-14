@@ -1,7 +1,8 @@
 /*
- * Copyright 2010-2011, Sikuli.org
+ * Copyright 2010-2013, Sikuli.org
  * Released under the MIT License.
  *
+ * modified RaiMan 2013
  */
 package org.sikuli.script;
 
@@ -23,7 +24,7 @@ public abstract class HotkeyManager {
         _instance = new LinuxHotkeyManager();
       }
       return _instance;
-*/      
+*/
       String cls = getOSHotkeyManagerClass();
       if (cls != null) {
         try {
