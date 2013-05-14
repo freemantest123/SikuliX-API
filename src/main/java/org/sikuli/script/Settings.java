@@ -15,11 +15,12 @@ import org.sikuli.system.OSUtil;
 public class Settings {
 
   public static boolean makeJythonRegion = false;
+  public static int breakPoint = 0;
 
   public static String libPath = null;
-  private static final String sikhomeEnv = System.getenv("SIKULI_HOME");
+  private static final String sikhomeEnv = System.getenv("SIKULIX_HOME");
   private static final String sikhomeProp = System.getProperty("sikuli.Home");
-  public static final String libSub = FileManager.slashify("SikuliX/libs", false);
+  public static final String libSub = FileManager.slashify("SikuliX-IDE/libs", false);
   private static String checkFileName;
 
 	/**
@@ -71,6 +72,7 @@ public class Settings {
 	public static String SikuliVersion = "#sikuliversion#";
   public static String SikuliVersionIDE;
 
+//TODO move libs check to FileManager
 	static {
     doDebug = false;
     File libsfolder;
@@ -157,11 +159,9 @@ public class Settings {
     // TODO check existence of an extension repository
     SikuliRepo = null;
 
-    // set the folder that should contain tessdata
-		if (isWindows()) {
-			OcrDataPath = libPathWin;
-		} else if (isMac()) {
-			OcrDataPath = libPathMac;
+//TODO set the folder that should contain tessdata
+		if (isWindows() || isMac() ) {
+			OcrDataPath = libPath;
 		} else {
 			OcrDataPath = "/usr/local/share";
 		}
@@ -218,7 +218,8 @@ public class Settings {
 	 * in-jar folder to load native libs from
 	 */
 	public static String libSource = "META-INF/libs/";
-	public static boolean OcrTextSearch = false;
+
+  public static boolean OcrTextSearch = false;
 	public static boolean OcrTextRead = false;
 
 	/**

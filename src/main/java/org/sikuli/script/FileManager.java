@@ -132,7 +132,7 @@ public class FileManager {
 
   /**
    * Gets the working directory to use for jni extraction. <br /> standard
-   * locations: <br /> Mac: "/Applications/Sikuli-IDE.app/Contents/Frameworks"
+   * locations: <br /> Mac: "/Applications/Sikuli-IDE.app/Contents/libs"
    * <br /> Windows / Linux & Mac (environment): %SIKULI_HOME% / $SIKULI_HOME
    * <br /> if not exists: java.io.tmp/tmplib
    *
@@ -251,7 +251,29 @@ public class FileManager {
 		return localPath + "/";
 	}
 
-	private static void writeFileList(InputStream ins, String fromPath, String outPath) throws IOException {
+  private static void writeFile(String from, String to) throws IOException {
+      Debug.log(7, "FileManager: JarResource: copy " + from + " to "+ to);
+			File toF = new File(to);
+			toF.getParentFile().mkdirs();
+			InputStream in = cl.getResourceAsStream(from);
+			if (in != null) {
+				OutputStream out = null;
+				try {
+					out = new FileOutputStream(toF);
+					copy(in, out);
+				} catch (IOException e) {
+					Debug.log(7, "FileManager: JarResource: Can't extract " + from + ": " + e.getMessage());
+				} finally {
+					if (out != null) {
+						out.close();
+					}
+				}
+			} else {
+				Debug.log(7, "FileManager: JarResource: not found: " + from);
+			}
+  }
+
+  private static void writeFileList(InputStream ins, String fromPath, String outPath) throws IOException {
 		BufferedReader r = new BufferedReader(new InputStreamReader(ins));
 		String line;
 		while ((line = r.readLine()) != null) {
