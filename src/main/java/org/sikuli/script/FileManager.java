@@ -373,7 +373,7 @@ public class FileManager {
 
 		File tempDir = new File(Settings.BaseTempPath + File.separator + "tmp-" + randomInt + ".sikuli");
 		if (tempDir.exists() == false) {
-			tempDir.mkdir();
+			tempDir.mkdirs();
 		}
 
 		tempDir.deleteOnExit();
