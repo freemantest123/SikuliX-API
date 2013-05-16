@@ -1,7 +1,8 @@
 /*
- * Copyright 2010-2011, Sikuli.org
+ * Copyright 2010-2013, Sikuli.org
  * Released under the MIT License.
  *
+ * modified RaiMan 2013
  */
 package org.sikuli.script;
 
@@ -51,7 +52,7 @@ public class ExtensionManager {
       url = Settings.SikuliRepo + name + "-" + version + ".jar";
     }
 		String extPath = Settings.getUserExtPath();
-		String tmpdir = System.getProperty("java.io.tmpdir");
+		String tmpdir = Settings.BaseTempPath;
 		try {
 			File localFile = new File(FileManager.downloadURL(new URL(url), tmpdir));
 			String extName = localFile.getName();

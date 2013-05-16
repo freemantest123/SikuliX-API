@@ -1,3 +1,9 @@
+/*
+ * Copyright 2010-2013, Sikuli.org
+ * Released under the MIT License.
+ *
+ * modified RaiMan 2013
+ */
 package org.sikuli.script;
 
 import java.awt.Desktop;
@@ -33,6 +39,7 @@ public class FileManager {
 	static final int DOWNLOAD_BUFFER_SIZE = 153600;
   private static List<String> libsList = new ArrayList<String>();
   private static ClassLoader cl;
+
 
   static {
     cl = FileManager.class.getClassLoader();
@@ -132,7 +139,7 @@ public class FileManager {
 
   /**
    * Gets the working directory to use for jni extraction. <br /> standard
-   * locations: <br /> Mac: "/Applications/Sikuli-IDE.app/Contents/Frameworks"
+   * locations: <br /> Mac: "/Applications/Sikuli-IDE.app/Contents/libs"
    * <br /> Windows / Linux & Mac (environment): %SIKULI_HOME% / $SIKULI_HOME
    * <br /> if not exists: java.io.tmp/tmplib
    *
@@ -155,7 +162,7 @@ public class FileManager {
           return jniDir;
         }
       }
-      String libTmpDir = System.getProperty("java.io.tmpdir") + "/tmplib";
+      String libTmpDir = Settings.BaseTempPath + File.separator + "tmplib";
       System.setProperty("java.library.tmpdir", libTmpDir);
       jniDir = new File(libTmpDir);
       Debug.log(2, "Initialised JNI library working directory to '" + jniDir + "'");
@@ -244,14 +251,36 @@ public class FileManager {
 	 */
 	public static String extract(String path) throws IOException {
 		InputStream in = cl.getResourceAsStream(path + "/filelist.txt");
-		String localPath = System.getProperty("java.io.tmpdir") + "/sikuli/" + path;
+		String localPath = Settings.BaseTempPath + File.separator + "sikuli" + File.separator + path;
 		new File(localPath).mkdirs();
 		Debug.log(4, "extract resources " + path + " to " + localPath);
 		writeFileList(in, path, localPath);
 		return localPath + "/";
 	}
 
-	private static void writeFileList(InputStream ins, String fromPath, String outPath) throws IOException {
+  private static void writeFile(String from, String to) throws IOException {
+      Debug.log(7, "FileManager: JarResource: copy " + from + " to "+ to);
+			File toF = new File(to);
+			toF.getParentFile().mkdirs();
+			InputStream in = cl.getResourceAsStream(from);
+			if (in != null) {
+				OutputStream out = null;
+				try {
+					out = new FileOutputStream(toF);
+					copy(in, out);
+				} catch (IOException e) {
+					Debug.log(7, "FileManager: JarResource: Can't extract " + from + ": " + e.getMessage());
+				} finally {
+					if (out != null) {
+						out.close();
+					}
+				}
+			} else {
+				Debug.log(7, "FileManager: JarResource: not found: " + from);
+			}
+  }
+
+  private static void writeFileList(InputStream ins, String fromPath, String outPath) throws IOException {
 		BufferedReader r = new BufferedReader(new InputStreamReader(ins));
 		String line;
 		while ((line = r.readLine()) != null) {
@@ -339,14 +368,12 @@ public class FileManager {
 	}
 
 	public static File createTempDir() {
-		final String baseTempPath = System.getProperty("java.io.tmpdir");
-
 		Random rand = new Random();
 		int randomInt = 1 + rand.nextInt();
 
-		File tempDir = new File(baseTempPath + File.separator + "tmp-" + randomInt + ".sikuli");
+		File tempDir = new File(Settings.BaseTempPath + File.separator + "tmp-" + randomInt + ".sikuli");
 		if (tempDir.exists() == false) {
-			tempDir.mkdir();
+			tempDir.mkdirs();
 		}
 
 		tempDir.deleteOnExit();

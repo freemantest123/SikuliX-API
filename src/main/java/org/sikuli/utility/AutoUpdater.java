@@ -1,8 +1,8 @@
 /*
- * Copyright 2010-2011, Sikuli.org
+ * Copyright 2010-2013, Sikuli.org
  * Released under the MIT License.
  *
- * modified RaiMan 2012
+ * modified RaiMan 2013
  */
 package org.sikuli.utility;
 
@@ -46,9 +46,10 @@ public class AutoUpdater {
     for (String s : Settings.ServerList) {
       try {
         if (checkUpdate(s)) {
-          if ( (isNewer(version, Settings.SikuliVersion) && beta == 0) ||
-               (!isNewer(version, Settings.SikuliVersion) && Settings.SikuliVersionBetaN > 0)
-                  && beta == 0 ) {
+          if (
+          (isNewer(version, Settings.SikuliVersion) && beta == 0) ||
+          (!isNewer(version, Settings.SikuliVersion)) && beta == 0 && Settings.SikuliVersionBetaN > 0)
+          {
             Debug.log(3, "A new major version is available: " + version);
             newMajor = true;
           }

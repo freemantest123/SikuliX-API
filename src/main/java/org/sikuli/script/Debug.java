@@ -1,7 +1,8 @@
 /*
- * Copyright 2010-2011, Sikuli.org
+ * Copyright 2010-2013, Sikuli.org
  * Released under the MIT License.
  *
+ * modified RaiMan 2013
  */
 package org.sikuli.script;
 
@@ -22,7 +23,7 @@ import java.util.Date;
  * folder)<br /> This can be restricted to Debug.user only (others go to System.out):<br />
  * -Dsikuli.LogfileUser=pathname (no path given: UserLog.txt in working folder)<br />
  *
- * This solution is NOT treadsafe !!!
+ * This solution is NOT threadsafe !!!
  */
 public class Debug {
 
@@ -107,7 +108,7 @@ public class Debug {
    */
   public static void history(String message, Object... args) {
     if (Settings.ActionLogs) {
-      log(-1, "[log] ", message, args);
+      log(-1, "log", message, args);
     }
   }
 
@@ -119,7 +120,7 @@ public class Debug {
    */
   public static void info(String message, Object... args) {
     if (Settings.InfoLogs) {
-      log(-1, "[info] ", message, args);
+      log(-1, "info", message, args);
     }
   }
 
@@ -130,7 +131,7 @@ public class Debug {
    * @param args to use with format string
    */
   public static void error(String message, Object... args) {
-    log(-1, "[error] ", message, args);
+    log(-1, "error", message, args);
   }
 
   /**
@@ -156,10 +157,10 @@ public class Debug {
     if (Settings.UserLogs) {
       if (Settings.UserLogTime) {
 //TODO replace the hack -99 to filter user logs
-        log(-99, String.format("[%s (%s)] ",
+        log(-99, String.format("%s (%s)",
                 Settings.UserLogPrefix, df.format(new Date())), message, args);
       } else {
-        log(-99, String.format("[%s] ", Settings.UserLogPrefix), message, args);
+        log(-99, String.format("%s", Settings.UserLogPrefix), message, args);
       }
     }
   }
@@ -174,19 +175,23 @@ public class Debug {
    */
   public static void log(int level, String message, Object... args) {
     if (Settings.DebugLogs) {
-      log(level, "[debug] ", message, args);
+      log(level, "debug", message, args);
     }
   }
 
   private static void log(int level, String prefix, String message, Object... args) {
-    String sout;
-    if (isEnabled(level)) {
-      if (args.length != 0) {
-        sout = String.format(prefix + message, args);
-      } else {
-        sout = prefix + message;
-      }
 //TODO replace the hack -99 to filter user logs
+    String sout;
+    String stime = "";
+    if (isEnabled(level)) {
+      if (Settings.LogTime && level != -99) {
+        stime = String.format(" (%s)", df.format(new Date()));
+      }
+      if (args.length != 0) {
+        sout = String.format("[" + prefix + stime + "] " + message, args);
+      } else {
+        sout = "[" + prefix + stime + "] " + message;
+      }
       if (level == -99 && printoutuser != null) {
         printoutuser.print(sout);
         printoutuser.println();
@@ -216,7 +221,7 @@ public class Debug {
    */
   public static void profile(String message, Object... args) {
     if (Settings.ProfileLogs) {
-      log(-1, "[profile] ", message, args);
+      log(-1, "profile", message, args);
     }
   }
 
