@@ -116,7 +116,7 @@ class Region(JRegion):
          min_size = arg1
          handler = arg2
       else:
-         assert t2 == None, "onChange: wrong arguments"
+         assert arg2 == None, "onChange: wrong arguments"
          min_size = None
          handler = arg1
       class AnonyObserver(SikuliEventAdapter):
