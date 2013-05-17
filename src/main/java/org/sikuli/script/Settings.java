@@ -69,7 +69,7 @@ public class Settings {
 
   public final static String SikuliVersionDefaultIDE = "SikuliX-IDE-1.0";
   public final static String SikuliVersionDefault = "SikuliX-1.0";
-  public final static int SikuliVersionBetaN = 600;
+  public final static int SikuliVersionBetaN = 999;
  	public static String SikuliVersionBeta = SikuliVersionDefault + "-Beta" + SikuliVersionBetaN;
  	public static String SikuliVersionBetaIDE = SikuliVersionDefaultIDE + "-Beta" + SikuliVersionBetaN;
 	public static String SikuliVersion = "#sikuliversion#";
