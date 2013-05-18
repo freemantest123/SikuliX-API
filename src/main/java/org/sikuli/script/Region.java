@@ -26,7 +26,6 @@ public class Region {
     final static float DEFAULT_HIGHLIGHT_TIME = Settings.DefaultHighlightTime;
     static final int PADDING = Settings.DefaultPadding;
 
-    private String scriptingType = "";
     private Screen scr;
     private ScreenHighlighter overlay = null;
 
@@ -58,14 +57,6 @@ public class Region {
     }
 
     //<editor-fold defaultstate="collapsed" desc="Initialization">
-
-    public void setScriptingType (String type) {
-        scriptingType = type;
-    }
-
-    public String getScriptingType () {
-        return scriptingType;
-    }
 
     private Region initialize(int X, int Y, int W, int H, Screen parentScreen) {
         x = X;

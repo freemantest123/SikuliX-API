@@ -81,7 +81,7 @@
 				</os>
 			</activation>
 			<properties>
-				<native.libs.includes>src/main/resources-linux/libs32/</native.libs.includes>
+				<native.libs.dir>src/main/resources-linux/libs32/</native.libs.dir>
 			</properties>
 		</profile>
 		<profile>
@@ -151,15 +151,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.python</groupId>
-			<artifactId>jython-standalone</artifactId>
-			<version>2.5.4-rc1</version>
-		</dependency>
-
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.0</version>
+			<version>4.4</version>
 			<type>jar</type>
 			<scope>test</scope>
 			<optional>true</optional>
@@ -200,19 +194,14 @@
 
 		<finalName>sikuli-japi</finalName>
 
-		<!-- copy python and native resources -->
+		<!-- copy native resources -->
 		<resources>
-			<resource> <!-- Sikuli Jython Resources: Python files -->
-				<directory>src/main/resources-jython-sikuli/</directory>
-				<targetPath>Lib/</targetPath>
-			</resource>
-
 			<resource> <!-- Native Resources, OS dependent -->
 				<directory>${native.libs.dir}</directory>
 				<targetPath>META-INF/libs</targetPath>
 			</resource>
 
-      <resource> <!-- Native Resources, not OS dependent -->
+            <resource> <!-- Native Resources, not OS dependent -->
 				<directory>src/main/resources/libs/</directory>
 				<targetPath>META-INF/libs</targetPath>
 			</resource>
@@ -290,6 +279,22 @@
 						</manifest>
 					</archive>
 				</configuration>
+			</plugin>
+
+			<!-- Plugin to create an additional jar containing the source -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
