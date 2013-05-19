@@ -66,12 +66,19 @@ public class Settings {
   private static String[] args = new String[0];
   public static String[] ServerList = {"https://dl.dropbox.com/u/42895525/SikuliX"};
 
-  public final static String SikuliVersionDefaultIDE = "SikuliX-IDE-1.0";
-  public final static String SikuliVersionDefault = "SikuliX-1.0";
-  public final static int SikuliVersionBetaN = 600;
- 	public static String SikuliVersionBeta = SikuliVersionDefault + "-Beta" + SikuliVersionBetaN;
- 	public static String SikuliVersionBetaIDE = SikuliVersionDefaultIDE + "-Beta" + SikuliVersionBetaN;
-	public static String SikuliVersion = "#sikuliversion#";
+  public static final int SikuliVersionMajor = 1;
+  public static final int SikuliVersionMinor = 0;
+  public static final int SikuliVersionSub = 0;
+  public static final int SikuliVersionBetaN = 999;
+  private static final String sversion = String.format("%d.%d.%d",
+                                   SikuliVersionMajor, SikuliVersionMinor, SikuliVersionSub);
+  private static final String bversion = String.format("%d.%d-Beta%d",
+                                   SikuliVersionMajor, SikuliVersionMinor, SikuliVersionBetaN);
+  public static final String SikuliVersionDefault = "SikuliX-"+sversion;
+ 	public static final String SikuliVersionBeta = "SikuliX-" + bversion;
+  public static final String SikuliVersionDefaultIDE = "SikuliX-IDE-" + sversion;
+ 	public static final String SikuliVersionBetaIDE = "SikuliX-IDE-" + bversion;
+	public static String SikuliVersion;
   public static String SikuliVersionIDE;
   public static String BaseTempPath;
 
@@ -175,13 +182,14 @@ public class Settings {
 		}
 
     // set the version strings
-    if (SikuliVersionBetaN > 0) {
+    if (SikuliVersionSub == 0 && SikuliVersionBetaN > 0) {
       SikuliVersion = SikuliVersionBeta;
       SikuliVersionIDE = SikuliVersionBetaIDE;
-    } else if ("#sikuliversion#".equals(SikuliVersion)) {
+    } else {
       SikuliVersion = SikuliVersionDefault;
       SikuliVersionIDE = SikuliVersionDefaultIDE;
   	}
+    doDebug = false; // to be used as breakpoint
 	}
 
   private static boolean doDebug;
