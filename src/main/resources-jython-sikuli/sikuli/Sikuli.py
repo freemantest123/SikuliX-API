@@ -60,7 +60,7 @@ def uprint(*args):
 ##
 # to make an utf8-encoded string from a str object
 #
-def uni(s):
+def unicd(s):
     return (unicode(s, "utf8"))
 
 ##
@@ -223,11 +223,15 @@ def shelp():
 
 ############### SECRET FUNCTIONS ################
 
-def initSikuli():
+def initSikuli(scr = None):
    dict = globals()
    dict['METHODCATALOG'] = sys.modules[__name__].__dict__
-   dict['SCREEN'] = Screen()
+   if scr == None:
+      #print "*** Sikuli: init SCREEN as ()"
+      dict['SCREEN'] = Screen()
+   else:
+      #print "*** Sikuli: init SCREEN as", scr
+      dict['SCREEN'] = Screen(scr)
    dict['SCREEN']._exposeAllMethods(__name__)
-
 
 initSikuli()
