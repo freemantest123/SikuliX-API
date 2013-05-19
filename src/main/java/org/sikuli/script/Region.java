@@ -2720,6 +2720,7 @@ public class Region {
       RobotDesktop r = getScreen().getActionRobot();
       for (int i = 0; i < text.length(); i++) {
         r.pressModifiers(modifiers);
+//TODO allow symbolic keys as #NAME. (CUT, COPY, PASTE, (select) ALL, ...)
         r.typeChar(text.charAt(i), RobotIF.KeyMode.PRESS_RELEASE);
         r.releaseModifiers(modifiers);
         r.delay(20);
