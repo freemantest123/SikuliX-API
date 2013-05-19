@@ -174,15 +174,16 @@ public class Screen extends Region implements EventObserver, ScreenIF {
    */
   public static void resetMonitors() {
     Debug.error("Re-evaluation of the monitor setup has been requested");
-    Debug.error("... Current Region objects might not be valid any longer");
-    Debug.error("... Use existing Region objects only if you know what you are doing");
+    Debug.error("... Current Region/Screen objects might not be valid any longer");
+    Debug.error("... Use existing Region/Screen objects only if you know what you are doing!");
+    Debug.error("... When using from Jython script: initSikuli() might be needed!");
     initScreens(true);
     Debug.info("*** new monitor configuration [ %s Screen(s)] ***", Screen.getNumberScreens());
     Debug.info("*** Primary is Screen %d", Screen.getPrimaryId());
 		for (int i=0; i < gdevs.length; i++) {
-      Debug.error("Screen %d: %s", i, Screen.getScreen(i).toStringShort());
+      Debug.info("Screen %d: %s", i, Screen.getScreen(i).toStringShort());
     }
-    Debug.error("*** end monitor configuration ***");
+    Debug.error("*** end new monitor configuration ***");
   }
 
   //</editor-fold>
