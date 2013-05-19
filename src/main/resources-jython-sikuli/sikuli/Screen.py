@@ -78,7 +78,7 @@ class Screen(Region):
                        'getClass', 'hashCode', 'notify', 'notifyAll',
                        'toGlobalCoord', 'toString', 'getLocationFromPSRML', 'getRegionFromPSRM',
                        'capture', 'selectRegion', 'create', 'observeInBackground', 'waitAll',
-                       'updateSelf', 'findAllNow', 'findAllNow', 'getEventManager']
+                       'updateSelf', 'findNow', 'findAllNow', 'getEventManager']
       if DEBUG: print "***** _exposeAllMethods", str(self)
       dict = sys.modules[mod].__dict__
       for name in dir(self):
