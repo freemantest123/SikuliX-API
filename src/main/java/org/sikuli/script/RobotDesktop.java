@@ -161,6 +161,15 @@ public class RobotDesktop extends Robot implements RobotIF {
   }
 
   @Override
+  public void keyDown(int code) {
+    if (!heldKeyCodes.contains(code)) {
+      keyPress(code);
+      heldKeyCodes.add(code);
+    }
+    waitForIdle();
+  }
+
+  @Override
   public void keyUp(String keys) {
     if (keys != null && !"".equals(keys)) {
       for (int i = 0; i < keys.length(); i++) {
@@ -174,15 +183,6 @@ public class RobotDesktop extends Robot implements RobotIF {
       }
       waitForIdle();
     }
-  }
-
-  @Override
-  public void keyDown(int code) {
-    if (!heldKeyCodes.contains(code)) {
-      keyPress(code);
-      heldKeyCodes.add(code);
-    }
-    waitForIdle();
   }
 
   @Override

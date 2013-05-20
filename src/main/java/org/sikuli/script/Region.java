@@ -2571,7 +2571,7 @@ public class Region {
    * release all currently pressed keys
    */
   public void keyUp() {
-    keyUp("");
+    getScreen().getActionRobot().keyUp();
   }
 
   /**
