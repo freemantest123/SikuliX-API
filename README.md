@@ -1,10 +1,13 @@
 SikuliX-API
 ===========
+**Download of current versions (non-beta)** visit the official [**download page on Launchpad**](https://launchpad.net/sikuli/+download).<br />
 
-**Current version: 1.0 Beta999 (last beta)** --- [click for downloadable packages](https://github.com/RaiMan/SikuliX-API/wiki/Packages)
+**latest betaversion: 1.0 Beta999 (last beta for 1.0)** --- [click for downloadable beta packages](https://github.com/RaiMan/SikuliX-API/wiki/Packages)
 
 Sikuli's Java API supporting visual testing and automation (currently using JNI/C++ to integrate with OpenCV and Tesseract)
 
+**MANDATORY ;-)** [Have a look at major improvements and new features](https://github.com/RaiMan/SikuliX-API/wiki/Release-Notes-API)
+<br /><br />
 Hava a look at the Java API: 
 [click to view Online](https://dl.dropboxusercontent.com/u/42895525/SikuliX/SikuliX-API-JavaDocs/index.html)
  or [click to download as zipfile](https://dl.dropboxusercontent.com/u/42895525/SikuliX/SikuliX-API-JavaDocs.zip)
@@ -23,7 +26,8 @@ If new to Sikuli, you might aternatively be interested in the pure Java implemen
 **Roadmap**
  - **2013 May 22:** release of SikuliX-API 1.0
   - there will be packages for Windows, Mac and Linux both 32- and 64-Bit
-  - more information: https://github.com/RaiMan/Sikuli12.11
+  - more information: [start here ...](http://www.sikuli.org/download.html)
+  - there will be service updates, if necessary (Help menu -> check for updates or Prefs: autoupdate)
 <br /><br />
  - **2013 June 15:** open a developement branch for SikuliX-API 1.1
   - use existing Java wrappers for OpenCV (javacv) and Tesseract (Tes4J) alternatively
@@ -47,5 +51,5 @@ If new to Sikuli, you might aternatively be interested in the pure Java implemen
  - you might always post an issue with any content in this repo of course
 
 **Contribution**
- - pull requests are always welcome, but must be with reference to the development branch (beginning mid June 2013)
+ - pull requests are always welcome (preferably after mid June 2013)
  - everyone is welcome to add interesting stuff, experiences, solutions to the wiki in this repo

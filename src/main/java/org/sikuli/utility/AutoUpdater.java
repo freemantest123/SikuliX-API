@@ -18,22 +18,36 @@ import org.sikuli.script.Settings;
 
 public class AutoUpdater {
 
-  private String version, details;
-  private int beta = 0;
+  private String details, bdetails;
   private String server = "";
-  public boolean newMajor = false;
-  public boolean newBeta = false;
-  public boolean notAvailable = false;
+  private String bserver = "";
+  private int major, minor, sub;
+  private int bmajor, bminor, beta;
+  private int smajor, sminor, ssub, sbeta;
+  private String name;
+  private static int MAJOR = 1;
+  private static int MINOR = 2;
+  private static int SUB = 3;
+  public static int SOMEBETA = 10;
+  public static int BETA = 5;
+  private static int FINAL = 6;
+  private int available = 0;
+  private boolean notAvailable = false;
 
   public String getServer() {
     return server;
   }
 
   public String getVersion() {
-    if (newMajor) {
-      return version;
-    } else if (newBeta) {
-      return version + "-Beta" + beta;
+    if (available > 0) {
+      return String.format("%s-%d.%d.%d", name, major, minor, sub);
+    }
+    return "";
+  }
+
+  public String getBeta() {
+    if (available == BETA || available >= SOMEBETA) {
+      return String.format("%s-%d.%d-Beta%d", name, bmajor, bminor, beta);
     }
     return "";
   }
@@ -42,35 +56,59 @@ public class AutoUpdater {
     return details;
   }
 
-  public boolean checkUpdate() {
+  public String getBetaDetails() {
+    return bdetails;
+  }
+
+  public int checkUpdate() {
     for (String s : Settings.ServerList) {
       try {
         if (checkUpdate(s)) {
-          if (
-          (isNewer(version, Settings.SikuliVersion) && beta == 0) ||
-          (!isNewer(version, Settings.SikuliVersion)) && beta == 0 && Settings.SikuliVersionBetaN > 0)
-          {
-            Debug.log(3, "A new major version is available: " + version);
-            newMajor = true;
+          smajor = Settings.SikuliVersionMajor;
+          sminor = Settings.SikuliVersionMinor;
+          ssub = Settings.SikuliVersionSub;
+          sbeta = Settings.SikuliVersionBetaN;
+          if (sbeta > 0) {
+            if (smajor == major && sminor == minor) {
+              available = FINAL;
+              Debug.info("The final version is available: " + getVersion());
+            } else if (smajor == bmajor && sminor == bminor && beta > sbeta) {
+              available = BETA;
+              Debug.info("A new beta version is available: " + getBeta());
+            }
+          } else {
+            if (major > smajor) {
+              available = MAJOR;
+              Debug.info("A new major version is available: " + getVersion());
+            } else if (minor > sminor) {
+              available = MINOR;
+              Debug.info("A new minor version is available: " + getVersion());
+            } else if (sub > ssub) {
+              available = SUB;
+              Debug.info("A new service update is available: " + getVersion());
+            }
           }
-          if ( (isNewer(version, Settings.SikuliVersion) && beta > 0) ||
-               (!isNewer(version, Settings.SikuliVersion) && beta > Settings.SikuliVersionBetaN)) {
-            Debug.log(3, "A new beta version is available: " + version + "-Beta" + beta);
-            newBeta = true;
+          if (bmajor > smajor || (bmajor == smajor && bminor > sminor)) {
+            available += SOMEBETA;
+            Debug.info("A beta version is available: " + getBeta());
           }
         }
       } catch (Exception e) {
-        Debug.log(3, "No version info available at " + s);
         notAvailable = true;
       }
-      if (newMajor || newBeta) {
-        return true;
+      if (notAvailable) {
+        Debug.log(2, "No version info available at " + s);
+        return 0;
       }
     }
-    return false;
+    return available;
   }
 
   private boolean checkUpdate(String s) throws IOException, MalformedURLException {
+    // contents of latestversion
+    //SikuliX 1 0 0 1 0 999
+    //DOWNLOAD https://launchpad.net/sikuli/+download
+    //BETA https://dl.dropboxusercontent.com/u/42895525/SikuliX/index.html
     URL url = new URL(s + "/latestversion");
     url.openConnection();
     URLConnection conn = url.openConnection();
@@ -79,9 +117,17 @@ public class AutoUpdater {
     String line;
     if ((line = in.readLine()) != null) {
       String[] vinfo = line.trim().split(" ");
-      version = vinfo[0];
-      if (vinfo.length > 1) {
-        beta = Integer.parseInt(vinfo[1]);
+      if (vinfo.length > 6) {
+        name = vinfo[0];
+        major = Integer.parseInt(vinfo[1]);
+        minor = Integer.parseInt(vinfo[2]);
+        sub = Integer.parseInt(vinfo[3]);
+        bmajor = Integer.parseInt(vinfo[4]);
+        bminor = Integer.parseInt(vinfo[5]);
+        beta = Integer.parseInt(vinfo[6]);
+      } else {
+        notAvailable = true;
+        return false;
       }
       details = "";
       if ((line = in.readLine()) != null) {
@@ -95,19 +141,36 @@ public class AutoUpdater {
         }
       }
       while ((line = in.readLine()) != null) {
+        if (line.startsWith("BETA")) {
+          bdetails = line;
+          break;
+        }
         details += line;
+      }
+      if (! "".equals(bdetails)) {
+        bserver = bdetails.split(" ")[1];
+        bdetails = "Pls. download at: " + bserver + "<br />";
+        bdetails += "-------------------------------------------------------------------------";
+        bdetails += "<br /><br />";
+      }
+      while ((line = in.readLine()) != null) {
+        bdetails += line;
       }
       return true;
     }
     return false;
   }
 
-  private boolean isNewer(String v1, String v2) {
-    return v1.compareTo(v2) > 0;
-  }
-
-  public void showUpdateFrame(String title, String text) {
-    UpdateFrame f = new UpdateFrame(title, text, server);
+  public JFrame showUpdateFrame(String title, String text, int whatUpdate) {
+    if (whatUpdate < 0) {
+      return new UpdateFrame(title, text, null);
+    } else {
+      if (whatUpdate == BETA) {
+        return new UpdateFrame(title, text, bserver);
+      } else {
+        return new UpdateFrame(title, text, server);
+      }
+    }
   }
 }
 
@@ -118,48 +181,51 @@ class UpdateFrame extends JFrame {
     setLocationRelativeTo(getRootPane());
     Container cp = getContentPane();
     cp.setLayout(new BorderLayout());
-    final JEditorPane p = new JEditorPane("text/html", text);
+    JEditorPane p = new JEditorPane("text/html", text);
     p.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     p.setEditable(false);
-    p.addHyperlinkListener(new HyperlinkListener() {
-      public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
-          try {
-            FileManager.openURL(e.getURL().toString());
-          } catch (Exception ex) {
-            ex.printStackTrace();
+    cp.add(new JScrollPane(p), BorderLayout.CENTER);
+    JButton btnOK = new JButton("ok");
+    if (server != null) {
+      p.addHyperlinkListener(new HyperlinkListener() {
+        @Override
+        public void hyperlinkUpdate(HyperlinkEvent e) {
+          if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
+            try {
+              FileManager.openURL(e.getURL().toString());
+            } catch (Exception ex) {
+              ex.printStackTrace();
+            }
           }
         }
-      }
-    });
-    cp.add(new JScrollPane(p), BorderLayout.CENTER);
-    JPanel buttonPane = new JPanel();
-    JButton btnOK = new JButton("ok");
-    btnOK.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent ae) {
-        UpdateFrame.this.dispose();
-      }
-    });
-    JButton btnGo = new JButton("download");
-    btnGo.setToolTipText(server);
-    btnGo.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent ae) {
-        FileManager.openURL(((JButton) ae.getSource()).getToolTipText());
-        UpdateFrame.this.dispose();
-      }
-    });
-    buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
-    buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
-    buttonPane.add(Box.createHorizontalGlue());
-    buttonPane.add(btnGo);
-    buttonPane.add(btnOK);
-    buttonPane.add(Box.createHorizontalGlue());
-    getRootPane().setDefaultButton(btnOK);
-
-    cp.add(buttonPane, BorderLayout.PAGE_END);
+      });
+      JPanel buttonPane = new JPanel();
+      btnOK.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+          UpdateFrame.this.dispose();
+        }
+      });
+      JButton btnGo = new JButton("download");
+      btnGo.setToolTipText(server);
+      btnGo.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+          FileManager.openURL(((JButton) ae.getSource()).getToolTipText());
+          UpdateFrame.this.dispose();
+        }
+      });
+      buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
+      buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 0));
+      buttonPane.add(Box.createHorizontalGlue());
+      buttonPane.add(btnGo);
+      buttonPane.add(btnOK);
+      buttonPane.add(Box.createHorizontalGlue());
+      getRootPane().setDefaultButton(btnOK);
+      cp.add(buttonPane, BorderLayout.PAGE_END);
+    }
     cp.doLayout();
     pack();
-
     setVisible(true);
     btnOK.requestFocus();
   }
