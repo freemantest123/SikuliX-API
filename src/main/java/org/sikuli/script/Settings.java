@@ -70,7 +70,7 @@ public class Settings {
   public static final int SikuliVersionMajor = 1;
   public static final int SikuliVersionMinor = 0;
   public static final int SikuliVersionSub = 0;
-  public static final int SikuliVersionBetaN = 999;
+  public static final int SikuliVersionBetaN = 0;
   private static final String sversion = String.format("%d.%d.%d",
                                    SikuliVersionMajor, SikuliVersionMinor, SikuliVersionSub);
   private static final String bversion = String.format("%d.%d-Beta%d",
