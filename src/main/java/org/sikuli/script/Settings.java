@@ -23,7 +23,7 @@ public class Settings {
   public static String libPath = null;
   private static final String sikhomeEnv = System.getenv("SIKULIX_HOME");
   private static final String sikhomeProp = System.getProperty("sikuli.Home");
-  public static final String libSub = FileManager.slashify("SikuliX-IDE/libs", false);
+  public static final String libSub = FileManager.slashify("SikuliX/libs", false);
   private static String checkFileName;
 
 	/**
@@ -75,10 +75,10 @@ public class Settings {
                                    SikuliVersionMajor, SikuliVersionMinor, SikuliVersionSub);
   private static final String bversion = String.format("%d.%d-Beta%d",
                                    SikuliVersionMajor, SikuliVersionMinor, SikuliVersionBetaN);
-  public static final String SikuliVersionDefault = "SikuliX-"+sversion;
- 	public static final String SikuliVersionBeta = "SikuliX-" + bversion;
-  public static final String SikuliVersionDefaultIDE = "SikuliX-IDE-" + sversion;
- 	public static final String SikuliVersionBetaIDE = "SikuliX-IDE-" + bversion;
+  public static final String SikuliVersionDefault = "Sikuli "+sversion;
+ 	public static final String SikuliVersionBeta = "Sikuli " + bversion;
+  public static final String SikuliVersionDefaultIDE = "Sikuli IDE " + sversion;
+ 	public static final String SikuliVersionBetaIDE = "Sikuli IDE " + bversion;
 	public static String SikuliVersion;
   public static String SikuliVersionIDE;
   public static String BaseTempPath;
