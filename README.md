@@ -1,5 +1,9 @@
 SikuliX-API 1.0.0
 ===========
+
+**Be Aware** until mid of June 2013 no progress and limited support due to vacations ;-) 
+<hr />
+
 **Download of current versions (non-beta)** visit the official [**download page on Launchpad**](https://launchpad.net/sikuli/+download).<br />
 
 **latest betaversion: 1.0 Beta999 (last beta for 1.0)** --- [click for downloadable beta packages](https://github.com/RaiMan/SikuliX-API/wiki/Packages)
