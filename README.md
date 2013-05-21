@@ -45,12 +45,12 @@ If new to Sikuli, you might aternatively be interested in the pure Java implemen
  - **2014:** new versions in April and October
 
 **History**
- - this is based on the developement at MIT (Tsung-Hsiang Chang (Sean aka vgod) and Tom Yeh) which was discontinued end 2011 (https://github.com/sikuli/sikuli) with a latest version called Sikuli X-1.0r930 (http://www.sikuli.org).
- - and the follow up repo https://github.com/RaiMan/Sikuli12.11, where I prepared the creation of a final version 1.0
- - in April 2013 I decided, to divide Sikuli X into the 2 packages SikuliX-IDE (https://github.com/RaiMan/SikuliX-IDE) and SikuliX-API (this repo), to better support future contributions.
+ - this is based on the developement at MIT (Tsung-Hsiang Chang (Sean aka vgod) and Tom Yeh) which was discontinued end 2011 (https://github.com/sikuli/sikuli) with a latest version called Sikuli X-1.0r930.
+ - and the [follow up repo](https://github.com/RaiMan/Sikuli12.11), where I prepared the creation of a final version 1.0
+ - in April 2013 I decided, to divide Sikuli into the 2 packages [Sikuli IDE](https://github.com/RaiMan/SikuliX-IDE) and Sikuli API (this repo), to better support future contributions.
 
 **Support**
- - until otherwise noted: questions, requests and bugs can be posted at https://answers.launchpad.net/sikuli
+ - until otherwise noted: [questions, requests and bugs can still be posted here](https://answers.launchpad.net/sikuli)
  - the wiki in this repo will be used extensively to document anything (taking over this roll from the webpage and lauchpad)
  - you might always post an issue with any content in this repo of course
 
