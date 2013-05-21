@@ -61,7 +61,7 @@ public class Location extends Point {
 	public Screen getScreenContaining(boolean verbose) {
     for (int i = 0; i < Screen.getNumberScreens(); i++) {
       Rectangle sb = Screen.getBounds(i);
-      sb.setSize(sb.width+1, sb.height+1);
+      sb.setSize(sb.width, sb.height);
       if (sb.contains(this)) {
         return Screen.getScreen(i);
       }
