@@ -8,6 +8,7 @@ package org.sikuli.script;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.net.URLDecoder;
 import java.security.CodeSource;
 import java.util.Date;
 import java.util.Properties;
@@ -124,15 +125,19 @@ public class Settings {
     // check parent folder of jar file
     if (libPath == null) {
       CodeSource src = Settings.class.getProtectionDomain().getCodeSource();
+      String lfp = null;
       if (src != null) {
         String srcParent = (new File(src.getLocation().getPath())).getParent();
         db("jar Location: "+srcParent);
-        libsfolder = (new File(srcParent, "libs"));
+        try {
+          lfp = FileManager.slashify(srcParent, true)+"libs";
+        } catch (Exception e) {}
+        libsfolder = (new File(lfp));
         Debug.log(2, "FileManager: LibsPath: sikuli-script.jar: "
-                +libsfolder.getAbsolutePath());
+                + lfp);
         if (libsfolder.exists()) {
           db("folder libs found in jar parent folder");
-          libPath = libsfolder.getAbsolutePath();
+          libPath = lfp;
         } else {
           db("no folder libs in jar parent folder");
         }
