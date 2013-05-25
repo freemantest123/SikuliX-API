@@ -38,6 +38,10 @@ public class SikuliScriptRunner {
 		return instance;
 	}
 
+	public static boolean hasInstance() {
+		return (instance != null);
+	}
+
 	public SikuliScriptRunner(String[] args) {
 		init(args, "OTHER");
 	}
