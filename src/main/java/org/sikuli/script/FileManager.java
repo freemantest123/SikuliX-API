@@ -19,11 +19,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
@@ -598,6 +602,10 @@ public class FileManager {
         p = p.substring(0, p.length() - 1);
       }
     }
-    return p;
+    try {
+      return URLDecoder.decode(p, "UTF-8");
+    } catch (UnsupportedEncodingException ex) {
+      return p;
+    }
   }
 }

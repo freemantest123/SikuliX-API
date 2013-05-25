@@ -8,6 +8,7 @@ package org.sikuli.script;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.net.URLDecoder;
 import java.security.CodeSource;
 import java.util.Date;
 import java.util.Properties;
@@ -22,8 +23,8 @@ public class Settings {
   public static String libPath = null;
   private static final String sikhomeEnv = System.getenv("SIKULIX_HOME");
   private static final String sikhomeProp = System.getProperty("sikuli.Home");
-  public static final String libSub = FileManager.slashify("SikuliX-IDE/libs", false);
-  private static String checkFileName;
+  public static final String libSub = FileManager.slashify("SikuliX/libs", false);
+  private static String checkFileName = null;
 
 	/**
 	 * Mac: standard place for native libs
@@ -69,15 +70,15 @@ public class Settings {
   public static final int SikuliVersionMajor = 1;
   public static final int SikuliVersionMinor = 0;
   public static final int SikuliVersionSub = 0;
-  public static final int SikuliVersionBetaN = 999;
+  public static final int SikuliVersionBetaN = 0;
   private static final String sversion = String.format("%d.%d.%d",
                                    SikuliVersionMajor, SikuliVersionMinor, SikuliVersionSub);
   private static final String bversion = String.format("%d.%d-Beta%d",
                                    SikuliVersionMajor, SikuliVersionMinor, SikuliVersionBetaN);
-  public static final String SikuliVersionDefault = "SikuliX-"+sversion;
- 	public static final String SikuliVersionBeta = "SikuliX-" + bversion;
-  public static final String SikuliVersionDefaultIDE = "SikuliX-IDE-" + sversion;
- 	public static final String SikuliVersionBetaIDE = "SikuliX-IDE-" + bversion;
+  public static final String SikuliVersionDefault = "Sikuli "+sversion;
+ 	public static final String SikuliVersionBeta = "Sikuli " + bversion;
+  public static final String SikuliVersionDefaultIDE = "Sikuli IDE " + sversion;
+ 	public static final String SikuliVersionBetaIDE = "Sikuli IDE " + bversion;
 	public static String SikuliVersion;
   public static String SikuliVersionIDE;
   public static String BaseTempPath;
@@ -97,6 +98,7 @@ public class Settings {
     // check Java property sikuli.home
     if (sikhomeProp != null) {
       libspath = (new File(FileManager.slashify(sikhomeProp, true) + "libs")).getAbsolutePath();
+      Debug.log(2, "FileManager: LibsPath: Java.System.Property.sikuli.Home: "+libspath);
       if ((new File(libspath)).exists()) {
         libPath = libspath;
       }
@@ -105,6 +107,7 @@ public class Settings {
     // check environmenet SIKULI_HOME
     if (libPath == null && sikhomeEnv != null) {
       libspath = FileManager.slashify(sikhomeEnv, true) + "libs";
+      Debug.log(2, "FileManager: LibsPath: Java.System.Environment.SIKULIX_HOME: "+libspath);
       if ((new File(libspath)).exists()) {
 //TODO this is a hack to check for the new SikuliX - find other solution
         getOS();
@@ -121,13 +124,19 @@ public class Settings {
     // check parent folder of jar file
     if (libPath == null) {
       CodeSource src = Settings.class.getProtectionDomain().getCodeSource();
+      String lfp = null;
       if (src != null) {
         String srcParent = (new File(src.getLocation().getPath())).getParent();
         db("jar Location: "+srcParent);
-        libsfolder = (new File(srcParent, "libs"));
+        try {
+          lfp = FileManager.slashify(srcParent, true)+"libs";
+        } catch (Exception e) {}
+        libsfolder = (new File(lfp));
+        Debug.log(2, "FileManager: LibsPath: sikuli-script.jar: "
+                + lfp);
         if (libsfolder.exists()) {
           db("folder libs found in jar parent folder");
-          libPath = libsfolder.getAbsolutePath();
+          libPath = lfp;
         } else {
           db("no folder libs in jar parent folder");
         }
@@ -140,6 +149,7 @@ public class Settings {
       File wdp = new File(System.getProperty("user.dir")).getParentFile();
       wd = new File(FileManager.slashify(wd.getAbsolutePath(), true) + libSub);
       wdp = new File(FileManager.slashify(wdp.getAbsolutePath(), true) + libSub);
+      Debug.log(2, "FileManager: LibsPath: Java.System.Property.user.dir: "+wd);
       if (wd.exists()) {
         libPath = wd.getAbsolutePath();
       } else if (wdp.exists()) {
@@ -160,6 +170,7 @@ public class Settings {
       } else {
         libPath = libPathMac;
       }
+      Debug.log(2, "FileManager: LibsPath: Mac fall back: "+libPath);
     }
 
     // check Windows specific folders
@@ -169,6 +180,7 @@ public class Settings {
       } else if ((new File(libPathWin32)).exists()) {
         libPath = libPathWin32;
       }
+      Debug.log(2, "FileManager: LibsPath: Windows fall back: "+libPath);
     }
 
     // TODO check existence of an extension repository
@@ -319,17 +331,16 @@ public class Settings {
 
 	public static int getOS() {
 		int osRet = ISNOTSUPPORTED;
-    checkFileName = null;
 		String os = System.getProperty("os.name").toLowerCase();
 		if (os.startsWith("mac")) {
 			osRet = ISMAC;
-      checkFileName = "MadeForMac";
+      if (checkFileName == null) checkFileName = "MadeForMac";
 		} else if (os.startsWith("windows")) {
 			osRet = ISWINDOWS;
-      checkFileName = "MadeForWindows";
+      if (checkFileName == null) checkFileName = "MadeForWindows";
 		} else if (os.startsWith("linux")) {
 			osRet = ISLINUX;
-      checkFileName = "MadeForLinux";
+      if (checkFileName == null) checkFileName = "MadeForLinux";
 		}
 		return osRet;
 	}
