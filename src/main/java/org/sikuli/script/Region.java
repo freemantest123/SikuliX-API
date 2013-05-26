@@ -2023,7 +2023,6 @@ public class Region {
             long before_find = (new Date()).getTime();
             ScreenImage simg = getScreen().capture(x, y, w, h);
             if (! evtMgr.update(simg)) {
-                stopObserver();
                 break;
             }
             long after_find = (new Date()).getTime();
@@ -2034,6 +2033,7 @@ public class Region {
             } catch (Exception e) {
             }
         }
+        stopObserver(); 
     }
     //</editor-fold>
 
