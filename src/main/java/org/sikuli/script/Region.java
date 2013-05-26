@@ -23,25 +23,28 @@ import java.util.List;
  */
 public class Region {
 
-    final static float DEFAULT_HIGHLIGHT_TIME = Settings.DefaultHighlightTime;
-    static final int PADDING = Settings.DefaultPadding;
-
+    /** The Screen containing the Region */
     private Screen scr;
+    /** The ScreenHighlighter for this Region */
     private ScreenHighlighter overlay = null;
 
-    public int x, y;
-    /**
-     * current width/height - might be cropped to screen
-     */
-    public int w, h;
-    /**
-     * width/height is remembered when region is cropped the 1st time and reused later
-     */
-    protected int vWidth = -1;
-    protected int vHeight = -1;
+    /** X-coordinate of the Region */
+    public int x;
 
-    private FindFailedResponse findFailedResponse =
-            Settings.defaultFindFailedResponse;
+    /** Y-coordinate of the Region */
+    public int y;
+
+    /**
+     * Width of the Region
+     */
+    public int w;
+
+    /**
+     * Height of the Region
+     */
+    public int h;
+
+    private FindFailedResponse findFailedResponse = Settings.defaultFindFailedResponse;
     protected boolean throwException = Settings.ThrowException;
     protected double autoWaitTimeout = Settings.AutoWaitTimeout;
     private boolean observing = false;
@@ -52,75 +55,102 @@ public class Region {
     @Override
     public String toString() {
         return String.format("R[%d,%d %dx%d]@%s E:%s, T:%.1f",
-                x, y, w, h, (getScreen()== null ? "Screen???" : getScreen().toStringShort()),
+                x, y, w, h, (getScreen()== null ? "Screen null" : getScreen().toStringShort()),
                 throwException ? "Y" : "N", autoWaitTimeout);
     }
 
     //<editor-fold defaultstate="collapsed" desc="Initialization">
 
-    private Region initialize(int X, int Y, int W, int H, Screen parentScreen) {
-        x = X;
-        y = Y;
-        w = W;
-        h = H;
-        if (parentScreen != null) {
-            setScreen(parentScreen);
+    /**
+     * Detects on which Screen the Region is present and crops the Region to the Screen if necessary.
+     * @param scr The Screen containing the Region
+     */
+    protected void initScreen(Screen scr) {
+        // check given screen first
+        if (scr != null) {
+
+            if (!fitScreenRegion(scr)) {
+                Debug.error("Region (%s, %s) outside any screen - subsequent actions might not work as expected", w, h);
+            }
+            return;
         }
-        initScreen(getScreen());
-        return this;
-    }
 
-    protected int getVW() {
-        return (vWidth < 0) ? w : vWidth;
-    }
-
-    protected int getVH() {
-        return (vHeight < 0) ? h : vHeight;
-    }
-
-    private void initScreen(Screen scr) {
-        if (!(this instanceof Screen)) {
-            Rectangle rect = new Rectangle(x, y, getVW(), getVH());
-            setScreen(null);
-            for (int i = 0; i < Screen.getNumberScreens(); i++) {
-                Rectangle sb = Screen.getBounds(i);
-                if (sb.contains(rect.getLocation())) {
-                    setScreen(Screen.getScreen(i));
-                    break;
-                }
-            }
-            Screen scrNew = getScreen();
-            if (scrNew == null) {
-                w = getVW();
-                h = getVH();
-                if (scr == null) {
-                    Debug.error("Region (%s, %s) outside any screen - subsequent actions might not work as expected", w, h);
-                } else {
-                    scrNew = scr;
-                }
-            }
-            if (scrNew != null) {
-                setScreen(scrNew);
-                rect = scrNew.getBounds().intersection(rect);
-                if (rect.width < w || rect.height < h) {
-                    Debug.log(1, "%s cropped to screen", this);
-                    if (vWidth < 0) {
-                        vWidth = w;
-                        vHeight = h;
-                    }
-                }
-                x = (int) rect.getX();
-                y = (int) rect.getY();
-                w = (int) rect.getWidth();
-                h = (int) rect.getHeight();
-                return; // to position a breakpoint here
+        // check all other possible screens later
+        for (int i = 0; i < Screen.getNumberScreens(); i++) {
+            if (fitScreenRegion(Screen.getScreen(i))) {
+                return;
             }
         }
-        updateSelf();
+
+        // no screen found
+        Debug.error("Region (%s, %s) outside any screen - subsequent actions might not work as expected", w, h);
+    }
+
+    /**
+     * Checks if the Screen contains the Region.
+     * If the Region is part or inside of the screen, the Region is cropped to the size of the screen if neccessary.
+     * @param screen The Screen in which the Region might be
+     * @return True, if the Region is on the Screen. False if the Region is not inside the Screen
+     */
+    protected boolean fitScreenRegion(Screen screen) {
+        if (screen == null) {
+            return false;
+        }
+
+        // get intersection of Region and Screen
+        Rectangle rect = screen.getRect().intersection(getRect());
+
+        // no Intersection, Region is not on the Screen
+        if (rect.isEmpty()) {
+            return false;
+        }
+
+        setScreen(screen);
+
+        if (x != rect.x || y != rect.y || w != rect.width || h != rect.height) {
+            Debug.log(1, "%s will be cropped to screen %s", this, screen);
+        }
+
+        setX(rect.x);
+        setY(rect.y);
+        setW(rect.width);
+        setH(rect.height);
+        return true;
     }
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Constructors to be used with Jython">
+
+    /**
+     * Create a region with the provided coordinate / size and screen
+     *
+     * @param X X position
+     * @param Y Y position
+     * @param W width
+     * @param H heigth
+     * @param screenNumber The number of the screen containing the Region
+     */
+    public Region(int X, int Y, int W, int H, int screenNumber) {
+        this(X, Y, W, H, Screen.getScreen(screenNumber));
+    }
+
+    /**
+     * Create a region with the provided coordinate / size and screen
+     *
+     * @param X X position
+     * @param Y Y position
+     * @param W width
+     * @param H heigth
+     * @param parentScreen the screen containing the Region
+     */
+    public Region(int X, int Y, int W, int H, Screen parentScreen) {
+        this.x = X;
+        this.y = Y;
+        this.w = W;
+        this.h = H;
+        initScreen(parentScreen);
+    }
+
     /**
      * Create a region with the provided coordinate / size
      *
@@ -130,7 +160,7 @@ public class Region {
      * @param H heigth
      */
     public Region(int X, int Y, int W, int H) {
-        initialize(X, Y, W, H, null);
+        this(X, Y, W, H, null);
     }
 
     /**
@@ -139,7 +169,7 @@ public class Region {
      * @param r the Rectangle
      */
     public Region(Rectangle r) {
-        initialize(r.x, r.y, r.width, r.height, null);
+        this(r.x, r.y, r.width, r.height, null);
     }
 
     /**
@@ -149,10 +179,10 @@ public class Region {
      * @param r the region
      */
     public Region(Region r) {
+        this(r.x, r.y, r.w, r.h, r.getScreen());
         autoWaitTimeout = r.autoWaitTimeout;
         findFailedResponse = r.findFailedResponse;
         throwException = r.throwException;
-        initialize(r.x, r.y, r.w, r.h, r.getScreen());
     }
 
     //</editor-fold>
@@ -188,11 +218,7 @@ public class Region {
      * @return the created region
      */
     private static Region create(int X, int Y, int W, int H, Screen scr) {
-        Region reg = new Region();
-        reg = reg.initialize(X, Y, W, H, scr);
-        StackTraceElement[] callstack = Thread.currentThread().getStackTrace();
-        String showMe = callstack[callstack.length-1].toString();
-        return reg;
+        return new Region(X, Y, W, H, scr);
     }
 
     /**
@@ -363,7 +389,7 @@ public class Region {
     public Region copyTo(Screen screen) {
         Location o = new Location(getScreen().getBounds().getLocation());
         Location n = new Location(screen.getBounds().getLocation());
-        return Region.create(n.x + x - o.x, n.y + y - o.y, getVW(), getVH());
+        return Region.create(n.x + x - o.x, n.y + y - o.y, w, h);
     }
 
     /**
@@ -1039,7 +1065,7 @@ public class Region {
      * @return the new region
      */
     public Region offset(Location loc) {
-        return Region.create(x + loc.x, y + loc.y, getVW(), getVH());
+        return Region.create(x + loc.x, y + loc.y, w, h);
     }
 
     /**
@@ -1050,7 +1076,7 @@ public class Region {
      */
     @Deprecated
     public Region nearby() {
-        return grow(PADDING, PADDING);
+        return grow(Settings.DefaultPadding, Settings.DefaultPadding);
     }
 
     /**
@@ -1085,7 +1111,7 @@ public class Region {
      */
     public Region grow(int w, int h) {
         Rectangle r = getRect();
-        r.setSize(getVW(), getVH());
+        r.setSize(w, h);
         r.grow(w, h);
         return Region.create(r.x, r.y, r.width, r.height, scr);
     }
@@ -1104,8 +1130,8 @@ public class Region {
         Rectangle re = getRect();
         int _x = x - l;
         int _y = y - b;
-        int _w = getVW() + l + r;
-        int _h = getVH() + t + b;
+        int _w = w + l + r;
+        int _h = h + t + b;
         return Region.create(_x, _y, _w, _h);
     }
 
@@ -1294,7 +1320,7 @@ public class Region {
      */
     public Region union(Region ur) {
         Rectangle r = getRect();
-        r.setSize(getVW(), getVH());
+        r.setSize(w, h);
         r = r.union(ur.getRect());
         return Region.create(r.x, r.y, r.width, r.height);
     }
@@ -1307,7 +1333,7 @@ public class Region {
      */
     public Region intersection(Region ir) {
         Rectangle r = getRect();
-        r.setSize(getVW(), getVH());
+        r.setSize(w, h);
         r = r.intersection(ir.getRect());
         return Region.create(r.x, r.y, r.width, r.height);
     }
@@ -1385,17 +1411,14 @@ public class Region {
     public Region highlight(int secs) {
         if (secs > 0) {
             return highlight((float) secs);
-        } else {
-            if (lastMatch != null) {
-                if (secs < 0) {
-                    return lastMatch.highlight((float) -secs);
-                } else {
-                    return lastMatch.highlight(Settings.DefaultHighlightTime);
-                }
-            } else {
-                return this;
-            }
         }
+        if (lastMatch != null) {
+            if (secs < 0) {
+                return lastMatch.highlight((float) -secs);
+            }
+            return lastMatch.highlight(Settings.DefaultHighlightTime);
+        }
+        return this;
     }
     //</editor-fold>
 
@@ -2500,7 +2523,7 @@ public class Region {
      * release all currently pressed keys
      */
     public void keyUp() {
-        getScreen().getActionRobot().keyUp(); 
+        getScreen().getActionRobot().keyUp();
     }
 
     /**
@@ -2651,7 +2674,7 @@ public class Region {
             RobotDesktop r = getScreen().getActionRobot();
             for (int i = 0; i < text.length(); i++) {
                 r.pressModifiers(modifiers);
-//TODO allow symbolic keys as #NAME. (CUT, COPY, PASTE, (select) ALL, ...)
+                //TODO allow symbolic keys as #NAME. (CUT, COPY, PASTE, (select) ALL, ...)
                 r.typeChar(text.charAt(i), RobotIF.KeyMode.PRESS_RELEASE);
                 r.releaseModifiers(modifiers);
                 r.delay(20);

@@ -143,7 +143,7 @@ public class Match extends Region implements Comparable {
   protected void setImage(String imageFileName) {
     image = imageFileName;
     if (Settings.Highlight) {
-      highlight(DEFAULT_HIGHLIGHT_TIME);
+      highlight(Settings.DefaultHighlightTime);
     }
   }
 
