@@ -8,7 +8,6 @@ package org.sikuli.script;
 
 import java.awt.AWTException;
 import java.awt.Color;
-import java.awt.GraphicsDevice;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
@@ -23,14 +22,14 @@ public class RobotDesktop extends Robot implements RobotIF {
   private static ArrayList<Integer> heldKeyCodes = new ArrayList<Integer>();
   private Screen scr = null;
 
+  @Override
+  public Screen getScreen() {
+      return scr;
+  }
+
   public RobotDesktop(Screen screen) throws AWTException {
     super(screen.getGraphicsDevice());
     scr = screen;
-  }
-
-  @Override
-  public GraphicsDevice getDevice() {
-    return scr.getGraphicsDevice();
   }
 
   @Override
@@ -47,9 +46,9 @@ public class RobotDesktop extends Robot implements RobotIF {
     }
 
     OverlayAnimator aniX = new TimeBasedAnimator(
-            new OutQuarticEase((float) src.x, (float) dest.x, ms));
+            new OutQuarticEase(src.x, dest.x, ms));
     OverlayAnimator aniY = new TimeBasedAnimator(
-            new OutQuarticEase((float) src.y, (float) dest.y, ms));
+            new OutQuarticEase(src.y, dest.y, ms));
     while (aniX.running()) {
       float x = aniX.step();
       float y = aniY.step();
@@ -231,4 +230,6 @@ public class RobotDesktop extends Robot implements RobotIF {
     HotkeyManager.getInstance().cleanUp();
     keyUp();
   }
+
+
 }

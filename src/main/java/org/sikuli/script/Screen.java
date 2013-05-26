@@ -30,15 +30,15 @@ import java.awt.Rectangle;
  */
 public class Screen extends Region implements EventObserver, ScreenIF {
 
-    static GraphicsEnvironment genv = null;
-    static GraphicsDevice[] gdevs;
-    static RobotDesktop[] robots;
-    static Screen[] screens;
+    protected static GraphicsEnvironment genv = null;
+    protected static GraphicsDevice[] gdevs;
+    protected static RobotDesktop[] robots;
+    protected static Screen[] screens;
     protected static int primaryScreen = -1;
     protected static RobotDesktop actionRobot;
-    private int curID = 0;
-    private GraphicsDevice curGD;
-    private Rectangle curROI;
+    protected int curID = 0;
+    protected GraphicsDevice curGD;
+    protected Rectangle curROI;
     protected boolean waitPrompt;
     protected OverlayCapturePrompt prompt;
     protected ScreenImage lastScreenImage;
@@ -49,7 +49,7 @@ public class Screen extends Region implements EventObserver, ScreenIF {
     }
 
     private static void initScreens(boolean reset) {
-        if (genv != null && ! reset) {
+        if (genv != null && !reset) {
             return;
         }
         genv = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -208,9 +208,8 @@ public class Screen extends Region implements EventObserver, ScreenIF {
         initScreens();
         if (id < 0 || id >= gdevs.length) {
             return primaryScreen;
-        } else {
-            return id;
         }
+        return id;
     }
 
     /**

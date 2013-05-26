@@ -6,8 +6,9 @@
  */
 package org.sikuli.script;
 
-import java.awt.*;
-import java.awt.image.*;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 
 public class ScreenUnion extends Screen {
    private Rectangle _bounds;

@@ -31,12 +31,12 @@ public interface RobotIF {
    void waitForIdle();
    void delay(int ms);
    void setAutoDelay(int ms);
-	 Color getColorAt(int x, int y);
+   Color getColorAt(int x, int y);
    void cleanup();
 
    /**
     *  Return the underlying device object (if any).
     */
-   Object getDevice();
+   Screen getScreen();
 }
 
