@@ -28,7 +28,7 @@ public class SikuliEventManager {
   private Map<Object, SikuliEventObserver> _appearOb, _vanishOb;
   private Map<Integer, SikuliEventObserver> _changeOb;
   private int _minChanges;
-  private boolean sthgLeft = true;
+  private boolean sthgLeft;
 
   public SikuliEventManager(Region region) {
     _region = region;
@@ -40,6 +40,11 @@ public class SikuliEventManager {
   }
 
   public void initialize() {
+    Debug.log(2, "SikuliEventManager: resetting observe states");
+    sthgLeft = true;
+    for (Object ptn : _state.keySet()) {
+      _state.put(ptn, State.UNKNOWN);
+    }
   }
 
   private <PSC> float getSimiliarity(PSC ptn) {
@@ -58,9 +63,19 @@ public class SikuliEventManager {
     _state.put(ptn, State.UNKNOWN);
   }
 
+  public <PSC> void removeAppearObserver(PSC ptn) {
+    _appearOb.remove(ptn);
+    _state.remove(ptn);
+  }
+
   public <PSC> void addVanishObserver(PSC ptn, SikuliEventObserver ob) {
     _vanishOb.put(ptn, ob);
     _state.put(ptn, State.UNKNOWN);
+  }
+
+  public <PSC> void removeVanishObserver(PSC ptn) {
+    _vanishOb.remove(ptn);
+    _state.remove(ptn);
   }
 
   protected void callAppearObserver(Object ptn, Match m) {
@@ -125,6 +140,11 @@ public class SikuliEventManager {
     _minChanges = getMinChanges();
   }
 
+  public void removeChangeObserver(int threshold) {
+    _changeOb.remove(new Integer(threshold));
+    _minChanges = getMinChanges();
+  }
+
   private int getMinChanges() {
     int min = Integer.MAX_VALUE;
     for (Integer n : _changeOb.keySet()) {
@@ -172,7 +192,8 @@ public class SikuliEventManager {
   }
 
   public boolean update(ScreenImage simg) {
-    boolean ret; ret = sthgLeft;
+    boolean ret;
+    ret = sthgLeft;
     if (sthgLeft) {
       checkPatterns(simg);
     }
