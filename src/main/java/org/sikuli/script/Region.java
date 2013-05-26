@@ -207,25 +207,30 @@ public class Region {
         return Region.create(loc.x, loc.y, w, h, null);
     }
 
+    public final static int CREATE_X_DIRECTION_LEFT = 0;
+    public final static int CREATE_X_DIRECTION_RIGHT = 1;
+    public final static int CREATE_Y_DIRECTION_TOP = 0;
+    public final static int CREATE_Y_DIRECTION_BOTTOM = 1;
+
     /**
      * create a region with a corner at the given point<br />as specified with x
      * y<br /> 0 0 top left<br /> 0 1 bottom left<br /> 1 0 top right<br /> 1 1
      * bottom right<br />
      *
      * @param loc the refence point
-     * @param x ==0 is left side !=0 is right side
-     * @param y ==0 is top side !=0 is bottom side
+     * @param CREATE_X_DIRECTION ==0 is left side !=0 is right side
+     * @param CREATE_Y_DIRECTION ==0 is top side !=0 is bottom side
      * @param w the width
      * @param h the height
      * @return the new region
      */
-    public static Region create(Location loc, int x, int y, int w, int h) {
+    public static Region create(Location loc, int CREATE_X_DIRECTION, int CREATE_Y_DIRECTION, int w, int h) {
         int X;
         int Y;
         int W = w;
         int H = h;
-        if (x == 0) {
-            if (y == 0) {
+        if (CREATE_X_DIRECTION == CREATE_X_DIRECTION_LEFT) {
+            if (CREATE_Y_DIRECTION == CREATE_Y_DIRECTION_TOP) {
                 X = loc.x;
                 Y = loc.y;
             } else {
@@ -233,7 +238,7 @@ public class Region {
                 Y = loc.y - h;
             }
         } else {
-            if (y == 0) {
+            if (CREATE_Y_DIRECTION == CREATE_Y_DIRECTION_TOP) {
                 X = loc.x - w;
                 Y = loc.y;
             } else {
@@ -2033,7 +2038,7 @@ public class Region {
             } catch (Exception e) {
             }
         }
-        stopObserver(); 
+        stopObserver();
     }
     //</editor-fold>
 
@@ -2500,7 +2505,7 @@ public class Region {
      * release all currently pressed keys
      */
     public void keyUp() {
-        getScreen().getActionRobot().keyUp(); 
+        getScreen().getActionRobot().keyUp();
     }
 
     /**
