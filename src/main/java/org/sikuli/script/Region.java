@@ -415,15 +415,6 @@ public class Region {
     }
 
     /**
-     * new region with same offset to current screen's top left on primary screen
-     *
-     * @return new region
-     */
-    public Region copyTo() {
-        return copyTo(Screen.getPrimaryScreen());
-    }
-
-    /**
      * new region with same offset to current screen's top left on given screen
      *
      * @param scrID number of screen
@@ -1861,98 +1852,6 @@ public class Region {
     //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Find internal -- obsolete??">
-    /**
-     *
-     * @param ptn
-     * @return the match if successful
-     * @throws FindFailed
-     * @deprecated should not be used anymore - use find() instead
-     */
-    @Deprecated
-    public <PatternOrString> Match findNow(PatternOrString ptn) throws FindFailed {
-        ScreenImage simg = getScreen().capture(x, y, w, h);
-        Finder f = new Finder(simg, this);
-        Match ret = null;
-        if (ptn instanceof String) {
-            if (null == f.find((String) ptn)) {
-                throw new FindFailed("ImageFile not found");
-            }
-        } else {
-            if (null == f.find((Pattern) ptn)) {
-                throw new FindFailed("ImageFile " + ((Pattern) ptn).getFilename()
-                        + " not found on disk");
-            }
-        }
-        if (f.hasNext()) {
-            ret = f.next();
-        }
-        f.destroy();
-        return ret;
-    }
-
-    /**
-     *
-     * @param ptn
-     * @return the itreator of matches if successful
-     * @throws FindFailed
-     * @deprecated should not be used anymore - use findAll() instead
-     */
-    @Deprecated
-    public <PatternOrString> Iterator<Match> findAllNow(PatternOrString ptn)
-            throws FindFailed {
-        ScreenImage simg = getScreen().capture(x, y, w, h);
-        Finder f = new Finder(simg, this);
-        if (ptn instanceof String) {
-            if (null == f.findAll((String) ptn)) {
-                throw new FindFailed("ImageFile not found");
-            }
-        } else {
-            if (null == f.findAll((Pattern) ptn)) {
-                throw new FindFailed("ImageFile " + ((Pattern) ptn).getFilename()
-                        + " not found on disk");
-            }
-        }
-        if (f.hasNext()) {
-            return f;
-        }
-        f.destroy();
-        return null;
-    }
-
-    /**
-     *
-     * @param target
-     * @param timeout
-     * @return the itreator of matches if successful
-     * @throws FindFailed
-     * @deprecated does not really make sense - use findAll() instead
-     */
-    @Deprecated
-    public <PatternOrString> Iterator<Match> waitAll(PatternOrString target, double timeout)
-            throws FindFailed {
-
-        while (true) {
-            try {
-
-                RepeatableFindAll rf = new RepeatableFindAll(target);
-                rf.repeat(timeout);
-                lastMatches = rf.getMatches();
-
-            } catch (Exception e) {
-                throw new FindFailed(e.getMessage());
-            }
-
-            if (lastMatches != null) {
-                break;
-            }
-
-            if (!handleFindFailed(target)) {
-                return null;
-            }
-        }
-
-        return lastMatches;
-    }
 
     private <PatternStringRegionMatch> Region getRegionFromTarget(PatternStringRegionMatch target) throws FindFailed {
         if (target instanceof Pattern || target instanceof String) {
@@ -2108,8 +2007,8 @@ public class Region {
         try { // needed to cut throw chain for FindFailed
             return click(checkMatch(), 0);
         } catch (FindFailed ex) {
+            return 0;
         }
-        return 0;
     }
 
     /**
@@ -2157,8 +2056,8 @@ public class Region {
         try { // needed to cut throw chain for FindFailed
             return doubleClick(checkMatch(), 0);
         } catch (FindFailed ex) {
+            return 0;
         }
-        return 0;
     }
 
     /**
@@ -2206,8 +2105,8 @@ public class Region {
         try { // needed to cut throw chain for FindFailed
             return rightClick(checkMatch(), 0);
         } catch (FindFailed ex) {
+            return 0;
         }
-        return 0;
     }
 
     /**
