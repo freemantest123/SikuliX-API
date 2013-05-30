@@ -14,7 +14,7 @@ import org.sikuli.script.ScreenImage;
 public class ScreenCaptureTest {
 
     @Test
-    public void testScreenCapture() {
+    public void testScreenCapture() throws Exception {
         Screen s = new Screen(0);
         ScreenImage img = s.capture(100,100,100,100);
         System.out.println(img.getFile());

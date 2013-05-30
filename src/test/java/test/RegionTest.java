@@ -170,7 +170,7 @@ public class RegionTest {
      * Tests if the Regions are cropped if the extend over top left:
      * The Region should be cropped so it is completely inside its screen.
      * This test checks if a Region that is out of its Screen on the top left corner is cropped to the Screen dimensions.
-     */
+
     @Test
     public void testRegionCropTopLeft() {
         Screen s = Screen.getPrimaryScreen();
@@ -180,13 +180,13 @@ public class RegionTest {
         assertEquals(s.getY(), r1.getY());
         assertEquals(90, r1.getW());
         assertEquals(180, r1.getH());
-    }
+    }*/
 
     /**
      * Tests if the Regions are cropped if the extend over top right:
      * The Region should be cropped so it is completely inside its screen.
      * This test checks if a Region that is out of its Screen on the top right corner is cropped to the Screen dimensions.
-     */
+
     @Test
     public void testRegionCropTopRight() {
         Screen s = Screen.getPrimaryScreen();
@@ -196,13 +196,13 @@ public class RegionTest {
         assertEquals(s.getY(), r1.getY());
         assertEquals(10, r1.getW());
         assertEquals(180, r1.getH());
-    }
+    }*/
 
     /**
      * Tests if the Regions are cropped if the extend over bottom left:
      * The Region should be cropped so it is completely inside its screen.
      * This test checks if a Region that is out of its Screen on the bottom left corner is cropped to the Screen dimensions.
-     */
+
     @Test
     public void testRegionCropBottomLeft() {
         Screen s = Screen.getPrimaryScreen();
@@ -212,13 +212,13 @@ public class RegionTest {
         assertEquals(s.getY() + s.getH() - 20, r1.getY());
         assertEquals(90, r1.getW());
         assertEquals(20, r1.getH());
-    }
+    }*/
 
     /**
      * Tests if the Regions are cropped if the extend over bottom right:
      * The Region should be cropped so it is completely inside its screen.
      * This test checks if a Region that is out of its Screen on the bottom right corner is cropped to the Screen dimensions.
-     */
+
     @Test
     public void testRegionCropBottomRight() {
         Screen s = Screen.getPrimaryScreen();
@@ -228,5 +228,5 @@ public class RegionTest {
         assertEquals(s.getY() + s.getH() - 20, r1.getY());
         assertEquals(10, r1.getW());
         assertEquals(20, r1.getH());
-    }
+    }*/
 }

@@ -6,8 +6,8 @@
  */
 package org.sikuli.script;
 
+import java.awt.Color;
 import java.awt.Point;
-import java.awt.Rectangle;
 
 /**
  * A point like AWT.Point using global coordinates, hence modifications might move location out of
@@ -51,62 +51,33 @@ public class Location extends Point {
     super(point);
   }
 
-  /**
-	 * Returns null, if outside of any screen<br />
-   * @param verbose true will show error message
-   * subsequent actions will crash
-	 *
-	 * @return the screen, that contains the given point.<br />
-	 */
-	public Screen getScreenContaining(boolean verbose) {
+   /**
+    * Returns null, if outside of any screen<br />
+    * subsequent actions will crash
+    *
+    * @return the screen, that contains the given point.<br />
+    */
+  public Screen getScreen() {
     for (int i = 0; i < Screen.getNumberScreens(); i++) {
-      Rectangle sb = Screen.getBounds(i);
-      sb.setSize(sb.width, sb.height);
-      if (sb.contains(this)) {
+      if (Screen.getScreen(i).contains(this)) {
         return Screen.getScreen(i);
       }
     }
-    if (verbose) {
-      Debug.error("Location: outside any screen (%s, %s) - subsequent actions might not work as expected", x, y);
-    }
+    Debug.error("Location: outside any screen (%s, %s) - subsequent actions might not work as expected", x, y);
     return null;
   }
-
-  /**
-   *
-   * @return the screen containing this point, the primary screen if outside of any screen
-   */
-  public Screen getScreen() {
-    Screen s = getScreenContaining(false);
-    if (s == null) {
-      return Screen.getPrimaryScreen();
-    }
-    return s;
-  }
-
 
 // TODO Location.getColor() implement more support and make it useable
   /**
    * Get the color at the given Point for details: see java.awt.Robot and ...Color
    *
-   * @param loc
-   * @return a 32-Bit value (Bits 24-31 is alpha, 16-23 is red, 8-15 is green, 0-7 is blue)
+   * @return The Color of the Point
    */
-  public int getColor() {
-    if (getScreenContaining(true) == null) {
-      return -1;
-    } else {
-      return getScreen().getActionRobot().getColorAt(x, y).getRGB();
+  public Color getColor() {
+    if (getScreen() == null) {
+      return null;
     }
-  }
-
-  /**
-   * to allow AWT features
-   *
-   * @return
-   */
-  public Point getPoint() {
-    return new Point(this);
+    return getScreen().getRobot().getColorAt(x, y);
   }
 
   /**
@@ -123,7 +94,6 @@ public class Location extends Point {
   /**
    * create a region with this point as center and the given size
    *
-   * @param loc the center point
    * @param w the width
    * @param h the height
    * @return the new region
@@ -135,7 +105,6 @@ public class Location extends Point {
   /**
    * create a region with this point as center and the given size
    *
-   * @param loc the center point
    * @param wh the width and height
    * @return the new region
    */
@@ -144,42 +113,17 @@ public class Location extends Point {
   }
 
   /**
-   * create a minimal symetric region at this point as center with size 3x3
-   *
-   * @param loc the center point
-   * @return the new region
-   */
-  public Region grow() {
-    return grow(3, 3);
-  }
-
-  /**
    * create a region with a corner at this point<br />as specified with x y<br /> 0 0 top left<br />
    * 0 1 bottom left<br /> 1 0 top right<br /> 1 1 bottom right<br />
    *
-   * @param loc the refence point
-   * @param x ==0 is left side !=0 is right side
-   * @param y ==0 is top side !=0 is bottom side
+   * @param CREATE_X_DIRECTION == 0 is left side !=0 is right side, see {@link Region#CREATE_X_DIRECTION_LEFT}, {@link Region#CREATE_X_DIRECTION_RIGHT}
+   * @param CREATE_Y_DIRECTION == 0 is top side !=0 is bottom side, see {@link Region#CREATE_Y_DIRECTION_TOP}, {@link Region#CREATE_Y_DIRECTION_BOTTOM}
    * @param w the width
    * @param h the height
    * @return the new region
    */
-  public Region grow(int x, int y, int w, int h) {
-    Region r = Region.create(0, 0, w, h);
-    if (x == 0) {
-      if (y == 0) {
-        r.setLocation(this);
-      } else {
-        r.setBottomLeft(this);
-      }
-    } else {
-      if (y == 0) {
-        r.setTopRight(this);
-      } else {
-        r.setBottomRight(this);
-      }
-    }
-    return r;
+  public Region grow(int CREATE_X_DIRECTION, int CREATE_Y_DIRECTION, int w, int h) {
+    return Region.create(this, CREATE_X_DIRECTION, CREATE_Y_DIRECTION, w, h);
   }
 
   /**
@@ -265,15 +209,6 @@ public class Location extends Point {
   }
 
   /**
-   * new point with same offset to current screen's top left on primary screen
-   *
-   * @return new location
-   */
-  public Location copyTo() {
-    return copyTo(Screen.getPrimaryScreen());
-  }
-
-  /**
    * new point with same offset to current screen's top left on given screen
    *
    * @param scrID number of screen
@@ -284,7 +219,7 @@ public class Location extends Point {
   }
 
   /**
-   * new point with same offset to current screen's top left on given screen
+   * New point with same offset to current screen's top left on given screen
    *
    * @param screen new parent screen
    * @return new location
@@ -296,16 +231,8 @@ public class Location extends Point {
   }
 
   /**
-   * new point with same offset to current screen's top left <br />on the given region's screen <br
-   * />mainly to support Jython Screen objects
-   *
-   * @param screen new parent screen
-   * @return new point
+   * {@inheritDoc}
    */
-  public Location copyTo(Region reg) {
-    return copyTo(reg.getScreen());
-  }
-
   @Override
   public String toString() {
     return "L(" + x + "," + y + ")@" + getScreen().toStringShort();
