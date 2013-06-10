@@ -26,8 +26,6 @@ import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
@@ -607,5 +605,34 @@ public class FileManager {
     } catch (UnsupportedEncodingException ex) {
       return p;
     }
+  }
+
+  /**
+   * Retrieves the actual script file
+   * @param scriptName The directory containing the ScriptFile.
+   * @return The File containing the actual script.
+   */
+  public static File getScriptFile(File scriptName, IScriptRunner runner) {
+    if (scriptName == null) {
+      return null;
+    }
+    int pos = scriptName.getName().lastIndexOf(".");
+    final String script;
+    if (pos == -1) {
+      script = scriptName.getName();
+    } else {
+      script = scriptName.getName().substring(0, pos);
+    }
+    File scriptFile = new File(scriptName, script + "." + runner.getFileEndings()[0]);
+    if (!scriptFile.exists() || scriptFile.isDirectory()) {
+      scriptFile = new File(scriptName, script);
+    } else {
+      return scriptFile;
+    }
+    if (!scriptFile.exists() || scriptFile.isDirectory()) {
+      // there is no file with no fileending either, real script file cannot be found
+      return null;
+    }
+    return scriptFile;
   }
 }

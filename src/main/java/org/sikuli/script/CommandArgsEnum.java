@@ -17,13 +17,13 @@ public enum CommandArgsEnum {
     TEST("test", "t", "foobar.sikuli", "runs a unittest with the available ScriptRunner"),
 
     /** Runs the script with the specified ScriptRunner */
-    SCRIPTRUNNER("scriptrunner", null, "scriptrunner", "ScriptRunner that will execute the script"),
+    SCRIPTRUNNER("scriptrunner", "x", "scriptrunner", "ScriptRunner that will execute the script"),
 
     /** Prints all errormessages to stdout */
     STDERR("stderr", "s", null, "print runtime errors to stderr instead of popping up a message box"),
 
     /** Preloads script in IDE */
-    LOAD("load", "l", "one or more foobar.sikuli", "peload scripts in IDE"),
+    LOAD("load", "l", "one or more foobar.sikuli", "preload scripts in IDE"),
 
     /** Arguments to be passed to the Script */
     ARGS("args", null, "arguments", "arguments passed to the script as parameters");

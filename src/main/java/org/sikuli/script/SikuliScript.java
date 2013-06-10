@@ -11,9 +11,7 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.ServiceLoader;
-
 import javax.swing.JOptionPane;
-
 import org.apache.commons.cli.CommandLine;
 
 /**
