@@ -19,7 +19,7 @@ public interface IScriptRunner {
    * Executes the Script.
    *
    * @param scriptfile File containing the script
-   * @param imagedirectory Directory containing the images
+   * @param imagedirectory Directory containing the images (might be null: parent of script)
    * @param scriptArgs Arguments to be passed directly to the script with --args
    * @return exitcode for the script execution
    */
@@ -29,7 +29,7 @@ public interface IScriptRunner {
    * Executes the Script as Test.
    *
    * @param scriptfile File containing the script
-   * @param imagedirectory Directory containing the images
+   * @param imagedirectory Directory containing the images (might be null: parent of script)
    * @param scriptArgs Arguments to be passed directly to the script with --args
    * @return exitcode for the script execution
    */

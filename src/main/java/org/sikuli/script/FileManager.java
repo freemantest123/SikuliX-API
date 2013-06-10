@@ -608,30 +608,49 @@ public class FileManager {
   }
 
   /**
-   * Retrieves the actual script file
-   * @param scriptName The directory containing the ScriptFile.
+   * Retrieves the actual script file<br />
+   * - from a folder script.sikuli<br />
+   * - from a folder script (no extension) (script.sikuli is used, if exists)<br />
+   * - from a file script.skl or script.zip (after unzipping to temp)<br />
+   * - from a jar script.jar (after preparing as extension)<br />
+   * @param scriptName one of the above.
    * @return The File containing the actual script.
    */
   public static File getScriptFile(File scriptName, IScriptRunner runner) {
     if (scriptName == null) {
       return null;
     }
+    String script;
+    String scriptType;
+    File scriptFile = null;
     int pos = scriptName.getName().lastIndexOf(".");
-    final String script;
     if (pos == -1) {
       script = scriptName.getName();
+      scriptType = "sikuli";
+      if ((new File(scriptName.getAbsolutePath()+".sikuli")).exists()) {
+        scriptName = new File(scriptName.getAbsolutePath()+".sikuli");
+      }
     } else {
       script = scriptName.getName().substring(0, pos);
+      scriptType = scriptName.getName().substring(pos+1);
     }
-    File scriptFile = new File(scriptName, script + "." + runner.getFileEndings()[0]);
-    if (!scriptFile.exists() || scriptFile.isDirectory()) {
-      scriptFile = new File(scriptName, script);
-    } else {
-      return scriptFile;
-    }
-    if (!scriptFile.exists() || scriptFile.isDirectory()) {
-      // there is no file with no fileending either, real script file cannot be found
-      return null;
+    if (scriptType == "sikuli") {
+      // try with fileending
+      scriptFile = new File(scriptName, script + "." + runner.getFileEndings()[0]);
+      if (!scriptFile.exists() || scriptFile.isDirectory()) {
+        // try without fileending
+        scriptFile = new File(scriptName, script);
+        if (!scriptFile.exists() || scriptFile.isDirectory()) {
+          // there is no file neither with nor without fileending
+          return null;
+        }
+      }
+    } else if (scriptType == "skl" || scriptType == "zip") {
+      //TODO unzip to temp and run from there
+      return null; // until ready
+    } else if (scriptType == "jar") {
+      //TODO try to load an run as extension
+      return null; // until ready
     }
     return scriptFile;
   }
