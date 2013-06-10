@@ -3,7 +3,6 @@ package test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-
 import org.junit.Test;
 import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
@@ -23,7 +22,8 @@ public class ScreenCaptureTest {
         assertNotNull(m);
 
         // screen 0 is always primary screen
-        assertEquals(Screen.getPrimaryScreen(), new Screen(0));
+        System.out.println(Screen.getPrimaryScreen().toStringShort());
+        assertEquals(Screen.getPrimaryScreen().toStringShort(), (new Screen(0)).toStringShort());
 
         Screen primary = Screen.getPrimaryScreen();
 
