@@ -21,9 +21,10 @@ public interface IScriptRunner {
    * @param scriptfile File containing the script
    * @param imagedirectory Directory containing the images (might be null: parent of script)
    * @param scriptArgs Arguments to be passed directly to the script with --args
+   * @param isIDE script runner needs to know, wether called from Sikuli IDE
    * @return exitcode for the script execution
    */
-  public int runScript(File scriptfile, File imagedirectory, String[] scriptArgs);
+  public int runScript(File scriptfile, File imagedirectory, String[] scriptArgs, String[] forIDE);
 
   /**
    * Executes the Script as Test.
@@ -31,9 +32,10 @@ public interface IScriptRunner {
    * @param scriptfile File containing the script
    * @param imagedirectory Directory containing the images (might be null: parent of script)
    * @param scriptArgs Arguments to be passed directly to the script with --args
+   * @param forIDE when called from Sikuli IDE additional info
    * @return exitcode for the script execution
    */
-  public int runTest(File scriptfile, File imagedirectory, String[] scriptArgs);
+  public int runTest(File scriptfile, File imagedirectory, String[] scriptArgs, String[] forIDE);
 
   /**
    * Starts an interactive session with the scriptrunner.
@@ -67,12 +69,34 @@ public interface IScriptRunner {
 
   /**
    * returns the list of possible script file endings, first is the default
-   * @return
+   *
+   * @return array of strings
    */
   public String[] getFileEndings();
+
+  /**
+   * checks wether this ScriptRunner supports the given fileending
+   *
+   * @return the lowercase fileending
+   */
+  public String hasFileEnding(String ending);
 
   /**
    * Is executed before Sikuli closes. Can be used to cleanup the ScriptRunner
    */
   public void close();
+
+  /**
+   * add statements to be run after SCRIPT_HEADER, but before script is executed
+   *
+   * @param stmts string array of statements (null resets the statement buffer)
+   */
+  public void execBefore(String[] stmts);
+
+  /**
+   * add statements to be run after script has ended
+   *
+   * @param stmts string array of statements (null resets the statement buffer)
+   */
+  public void execAfter(String[] stmts);
 }

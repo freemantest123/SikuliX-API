@@ -19,195 +19,203 @@ import org.apache.commons.cli.CommandLine;
  */
 public class SikuliScript {
 
-    /**
-     * The ScriptRunner that is used to execute the script.
-     */
-    private static IScriptRunner runner = null;
+  /**
+   * The ScriptRunner that is used to execute the script.
+   */
+  private static IScriptRunner runner;
+  private static File imagePath;
+  private static Boolean runAsTest;
 
-    /**
-     * Finds a ScriptRunner implementation to execute the script.
-     * @param name Name of the ScriptRunner, if more than one runner is available. If there is only one ScriptRunner available, this parameter can be null.
-     * @return The found ScriptRunner. If none or <b> more than one </b> matching ScriptRunner is found, null is returned.
-     */
-    private static IScriptRunner getScriptRunner(String name) {
-        ServiceLoader<IScriptRunner> loader = ServiceLoader.load(IScriptRunner.class);
+  /**
+   * Main method
+   *
+   * @param args passed arguments
+   */
+  public static void main(String[] args) {
 
-        Iterator<IScriptRunner> scriptRunnerIterator = loader.iterator();
+    Settings.showJavaInfo();
 
-        while (scriptRunnerIterator.hasNext()) {
-            IScriptRunner currentRunner = scriptRunnerIterator.next();
+    for (int i = 0; i < args.length; i++) {
+      Debug.log(2, "arg %d: %s", i + 1, args[i]);
+    }
+    CommandArgs cmdArgs = new CommandArgs("SCRIPT");
+    CommandLine cmdLine = cmdArgs.getCommandLine(args);
 
-            // if there is a name, return the runner with the matching name
-            if (name != null && currentRunner.getName().toLowerCase().equals(name.toLowerCase())) {
-                return currentRunner;
-            }
-            // no name and/or no match, runner is saved temporary
-            if (runner == null) {
-                runner = currentRunner;
-            } else {
-                // more than one ScriptRunner was found, but names didn't match, null is returned because we cannot decide which one to use
-                return null;
-            }
-        }
-        return runner;
+    if (cmdLine == null || cmdLine.getOptions().length == 0) {
+      Debug.error("Did not find any valid options on command line!");
+      System.exit(1);
     }
 
-    /**
-     * Main method
-     * @param args passed arguments
-     */
-    public static void main(String[] args) {
-
-        Settings.showJavaInfo();
-
-        CommandArgs cmdArgs = new CommandArgs("SCRIPT");
-        CommandLine cmdLine = cmdArgs.getCommandLine(args);
-
-        IScriptRunner runner = null;
-
-        if (cmdLine != null) { // Load the specified scriptrunner if possible
-            runner = getScriptRunner(cmdLine.getOptionValue(CommandArgsEnum.SCRIPTRUNNER.longname()));
-        }
-
-        if (runner == null) { // Check if a scriptrunner could be loaded
-            Debug.error("None or more than one ScriptRunner found! Please check if a ScriptRunner is available and specify the ScriptRunner if more than one is available.");
-            System.exit(1);
-        }
-
-        runner.init(args); // init scriptrunner
-
-        if (cmdLine == null) { // check if any commandline args were loaded and print std help and runner specific help
-            Debug.error("Nothing to do! No valid arguments on commandline!");
-            cmdArgs.printHelp();
-            System.out.println(runner.getCommandLineHelp());
-            System.exit(1);
-        }
-
-        // print help
-        if (cmdLine.hasOption(CommandArgsEnum.HELP.shortname())) {
-            cmdArgs.printHelp();
-            System.out.println(runner.getCommandLineHelp());
-            System.exit(1);
-        }
-
-        // start interactive session
-        if (cmdLine.hasOption(CommandArgsEnum.INTERACTIVE.shortname())) {
-            int exitCode = runner.runInteractive(cmdLine.getOptionValues(CommandArgsEnum.ARGS.longname()));
-            runner.close();
-            System.exit(exitCode);
-        }
-
-        // start script execution
-        if (cmdLine.hasOption(CommandArgsEnum.RUN.shortname())) {
-            File runFile = new File(cmdLine.getOptionValue(CommandArgsEnum.RUN.longname()));
-            if (!runFile.exists() || (runFile.isDirectory() && !runFile.getName().endsWith(".sikuli"))) {
-                Debug.error("Script File "+runFile.getAbsolutePath()+" does not exist or is a directory but does not have a name ending with .sikuli");
-                System.exit(1);
-            }
-
-            File imagePath = resolveImagePath(runFile);
-            ImageLocator.setBundlePath(imagePath.getAbsolutePath());
-
-            int exitCode = runner.runScript(runFile, imagePath, cmdLine.getOptionValues(CommandArgsEnum.ARGS.longname()));
-            runner.close();
-            System.exit(exitCode);
-        }
-
-        // start script as testcase
-        if (cmdLine.hasOption(CommandArgsEnum.TEST.shortname())) {
-            File runFile = new File(cmdLine.getOptionValue(CommandArgsEnum.RUN.longname()));
-            if (!runFile.exists() || (runFile.isDirectory() && runFile.getName().endsWith(".sikuli"))) {
-                Debug.error("Script File does not exist or is a directory but does not have a name ending with .sikuli");
-                System.exit(1);
-            }
-
-            File imagePath = resolveImagePath(runFile);
-            ImageLocator.setBundlePath(imagePath.getAbsolutePath());
-
-            int exitCode = runner.runTest(runFile, resolveImagePath(runFile), cmdLine.getOptionValues(CommandArgsEnum.ARGS.longname()));
-            runner.close();
-            System.exit(exitCode);
-        }
+    // check if any commandline args were loaded and print std help and runner specific help
+    if (cmdLine == null) {
+      Debug.error("Nothing to do! No valid arguments on commandline!");
+      cmdArgs.printHelp();
+      System.exit(1);
     }
 
-    /**
-     * Returns the directory that contains the images used by the ScriptRunner.
-     * @param scriptFile The file containing the script.
-     * @return The directory containing the images.
-     */
-    public static File resolveImagePath(File scriptFile) {
-        if (!scriptFile.isDirectory()) {
-            return scriptFile.getParentFile();
-        }
-
-        return scriptFile;
+    if (cmdLine.hasOption(CommandArgsEnum.SCRIPTRUNNER.shortname())) {
+      runner = getScriptRunner(cmdLine.getOptionValue(CommandArgsEnum.SCRIPTRUNNER.longname()),
+                                   null, args);
+    } else {
+      runner = null;
     }
 
-    public static void setShowActions(boolean flag) {
-        Settings.ShowActions = flag;
-        if (flag) {
-            if (Settings.MoveMouseDelay < 1f) {
-                Settings.MoveMouseDelay = 1f;
-            }
-        }
+    // print help
+    if (cmdLine.hasOption(CommandArgsEnum.HELP.shortname())) {
+      cmdArgs.printHelp();
+      if (runner != null) {
+        System.out.println(runner.getCommandLineHelp());
+      }
+      System.exit(1);
     }
 
-    public static String input(String msg) {
-        return JOptionPane.showInputDialog(msg);
+//TODO    if (cmdLine.hasOption(CommandArgsEnum.IMAGEPATH.shortname())) {
+    if (false) {
+//      imagePath = getScriptRunner(cmdLine.getOptionValue(CommandArgsEnum.IMAGEPATH.longname()), null, args);
+    } else {
+      imagePath = null;
     }
 
-    public static String input(String msg, String preset) {
-        return JOptionPane.showInputDialog(msg, preset);
+    // start interactive session
+    if (cmdLine.hasOption(CommandArgsEnum.INTERACTIVE.shortname())) {
+      int exitCode = 0;
+      if (runner == null) {
+        //TODO want to overload the -i option
+        //(-i is Jython -i xxx is xxx interactive, together with -r/-t it defines the runner
+        exitCode = getScriptRunner("jython", null, args).runInteractive(args);
+      } else {
+        runner.runInteractive(args);
+      }
+      runner.close();
+      System.exit(exitCode);
     }
 
-    public static int switchApp(String appName) {
-        if (App.focus(appName) != null) {
-            return 0;
-        }
-        return -1;
+    // start script execution
+    String givenScriptName = null;
+    runAsTest = false;
+    if (cmdLine.hasOption(CommandArgsEnum.RUN.shortname())) {
+      givenScriptName = cmdLine.getOptionValue(CommandArgsEnum.RUN.longname());
+    } else if (cmdLine.hasOption(CommandArgsEnum.TEST.shortname())) {
+      givenScriptName = cmdLine.getOptionValue(CommandArgsEnum.TEST.longname());
+      runAsTest = true;
     }
+    if (givenScriptName != null) {
+      File script = FileManager.getScriptFile(new File(givenScriptName), runner, args);
+      if (script == null) {
+        System.exit(1);
+      }
+      if (imagePath == null) {
+        imagePath = FileManager.resolveImagePath(script);
+      }
+      ImageLocator.setBundlePath(imagePath.getAbsolutePath());
+      int exitCode = runAsTest ?
+                       runner.runTest(script, imagePath,
+                       cmdLine.getOptionValues(CommandArgsEnum.ARGS.longname()), null) :
+                       runner.runScript(script, imagePath,
+                       cmdLine.getOptionValues(CommandArgsEnum.ARGS.longname()), null);
+      runner.close();
+      System.exit(exitCode);
+    } else {
+      Debug.error("Nothing to do according to the given commandline options!");
+      cmdArgs.printHelp();
+      if (runner != null) {
+        System.out.println(runner.getCommandLineHelp());
+      }
+      System.exit(1);
+    }
+  }
 
-    public static int openApp(String appName) {
-        if (App.open(appName) != null) {
-            return 0;
-        }
-        return -1;
-    }
+  public static void setRunner(IScriptRunner _runner) {
+    runner = _runner;
+  }
 
-    public static int closeApp(String appName) {
-        return App.close(appName);
+  public static void setShowActions(boolean flag) {
+    Settings.ShowActions = flag;
+    if (flag) {
+      if (Settings.MoveMouseDelay < 1f) {
+        Settings.MoveMouseDelay = 1f;
+      }
     }
+  }
 
-    public static void popup(String message, String title) {
-        JOptionPane.showMessageDialog(null, message,
-                title, JOptionPane.PLAIN_MESSAGE);
-    }
+  public static String input(String msg) {
+    return JOptionPane.showInputDialog(msg);
+  }
 
-    public static void popup(String message) {
-        popup(message, "Sikuli");
-    }
+  public static String input(String msg, String preset) {
+    return JOptionPane.showInputDialog(msg, preset);
+  }
 
-    public static String run(String cmdline) {
-        //TODO: improve run command
-        String lines = "";
-        try {
-            String line;
-            Process p = Runtime.getRuntime().exec(cmdline);
-            BufferedReader input =
-                    new BufferedReader(new InputStreamReader(p.getInputStream()));
-            while ((line = input.readLine()) != null) {
-                lines = lines + '\n' + line;
-            }
-        } catch (Exception err) {
-            err.printStackTrace();
-        }
-        return lines;
+  public static int switchApp(String appName) {
+    if (App.focus(appName) != null) {
+      return 0;
     }
+    return -1;
+  }
 
-    /**
-     * Prints the interactive help from the ScriptRunner.
-     */
-    public static void shelp() {
-        System.out.println(runner.getInteractiveHelp());
+  public static int openApp(String appName) {
+    if (App.open(appName) != null) {
+      return 0;
     }
+    return -1;
+  }
+
+  public static int closeApp(String appName) {
+    return App.close(appName);
+  }
+
+  public static void popup(String message, String title) {
+    JOptionPane.showMessageDialog(null, message,
+            title, JOptionPane.PLAIN_MESSAGE);
+  }
+
+  public static void popup(String message) {
+    popup(message, "Sikuli");
+  }
+
+  public static String run(String cmdline) {
+    //TODO: improve run command
+    String lines = "";
+    try {
+      String line;
+      Process p = Runtime.getRuntime().exec(cmdline);
+      BufferedReader input =
+              new BufferedReader(new InputStreamReader(p.getInputStream()));
+      while ((line = input.readLine()) != null) {
+        lines = lines + '\n' + line;
+      }
+    } catch (Exception err) {
+      err.printStackTrace();
+    }
+    return lines;
+  }
+
+  /**
+   * Prints the interactive help from the ScriptRunner.
+   */
+  public static void shelp() {
+    System.out.println(runner.getInteractiveHelp());
+  }
+
+  /**
+   * Finds a ScriptRunner implementation to execute the script.
+   *
+   * @param name Name of the ScriptRunner, might be null (then type is used)
+   * @param ending fileending of script to run
+   * @return first ScriptRunner with matching name or file ending, null if none found
+   */
+  public static IScriptRunner getScriptRunner(String name, String ending, String[] args) {
+    IScriptRunner runner = null;
+    ServiceLoader<IScriptRunner> loader = ServiceLoader.load(IScriptRunner.class);
+    Iterator<IScriptRunner> scriptRunnerIterator = loader.iterator();
+    while (scriptRunnerIterator.hasNext()) {
+      IScriptRunner currentRunner = scriptRunnerIterator.next();
+      if ((name != null && currentRunner.getName().toLowerCase().equals(name.toLowerCase())) || (ending != null && currentRunner.hasFileEnding(ending) != null)) {
+        runner = currentRunner;
+        runner.init(args);
+        break;
+      }
+    }
+    return runner;
+  }
 }
