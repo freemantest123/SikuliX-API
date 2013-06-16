@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <!--
+  * Copyright 2010-2013, Sikuli.org
+  * Released under the MIT License.
+  *
+  * added Kelthuzad 2013
+  * modified RaiMan 2013
+  -->
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.sikuli</groupId>
+  <artifactId>SikuliX-API</artifactId>
+  <name>SikuliX-API</name>
+  <url>http://www.sikuli.org</url>
+  <version>1.0.1</version>
+
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://www.sikuli.org/LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>kelthuzad</id>
+      <name>kelthuzad</name>
+      <email>j_the_k@web.de</email>
+    </developer>
+    <developer>
+      <id>RaiMan</id>
+      <name>RaiMan</name>
+      <email>rmhdevelop@me.com</email>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git://github.com/RaiMan/SikuliX-API.git</connection>
+    <developerConnection>scm:git:git://github.com/RaiMan/SikuliX-API.git</developerConnection>
+    <url>git://github.com/RaiMan/SikuliX-API.git</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <repositories>
+    <repository> <!-- needed for jxgrabkey -->
+      <id>uni-due.de</id>
+      <name>uni-due.de</name>
+      <url>http://mvn.is.inf.uni-due.de:8081/nexus/content/repositories/atunes-dependencies/</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sikuli</groupId>
+      <artifactId>SikuliX-Jython</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-cli</groupId>
+      <artifactId>commons-cli</artifactId>
+      <version>1.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.melloware</groupId>
+      <artifactId>jintellitype</artifactId>
+      <version>1.3.7</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jxgrabkey</groupId>
+      <artifactId>jxgrabkey</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.1</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+        <executions>
+          <execution>
+            <id>default-testCompile</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>testCompile</goal>
+            </goals>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.7.2</version>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+
+      <!-- Plugin to create an executable jar containing all dependencies -->
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>org.sikuli.script.SikuliScript</mainClass>
+            </manifest>
+          </archive>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <finalName>sikuli-script</finalName>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

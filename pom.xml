@@ -68,11 +68,13 @@
 	</repositories>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.sikuli</groupId>
-			<artifactId>SikuliX-Jython</artifactId>
-			<version>1.0.1</version>
-		</dependency>
+    <!-- activate, if you want to develop/test sikuli-script features in an IDE
+    <dependency>
+      <groupId>org.sikuli</groupId>
+      <artifactId>SikuliX-Jython</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+    -->
 
     <dependency>
 			<groupId>commons-cli</groupId>
@@ -159,33 +161,6 @@
 						</manifest>
 					</archive>
 				</configuration>
-			</plugin>
-
-			<!-- Plugin to create an executable jar containing all dependencies-->
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>org.sikuli.script.SikuliScript</mainClass>
-						</manifest>
-					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<finalName>sikuli-script</finalName>
-					<!-- <appendAssemblyId>false</appendAssemblyId> -->
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 
 			<!-- Plugin to create an additional jar containing the source -->
