@@ -626,15 +626,16 @@ public class FileManager {
     if ("sikuli".equals(scriptType)) {
       if (runner == null) {
         //TODO identify runner from ending of file with same name as folder
-        SikuliScript.setRunner(SikuliScript.getScriptRunner("jython", null, args));
-      } else {
+        runner = SikuliScript.setRunner(SikuliScript.getScriptRunner("jython", null, args));
+      }
+      if (scriptFile == null) {
         // try with fileending
-        scriptFile = new File(scriptName, script + "." + runner.getFileEndings()[0]);
+        scriptFile = (new File(scriptName, script + "." + runner.getFileEndings()[0])).getAbsoluteFile();
         if (!scriptFile.exists() || scriptFile.isDirectory()) {
           // try without fileending
           scriptFile = new File(scriptName, script);
           if (!scriptFile.exists() || scriptFile.isDirectory()) {
-            Debug.error("No runnable script found in %s", scriptName.getAbsolutePath());
+            Debug.error("No runnable script found in %s", scriptFile.getAbsolutePath());
             return null;
           }
         }

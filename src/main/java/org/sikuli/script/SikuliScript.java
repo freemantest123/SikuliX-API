@@ -82,10 +82,9 @@ public class SikuliScript {
       if (runner == null) {
         //TODO want to overload the -i option
         //(-i is Jython -i xxx is xxx interactive, together with -r/-t it defines the runner
-        exitCode = getScriptRunner("jython", null, args).runInteractive(args);
-      } else {
-        runner.runInteractive(args);
+        runner = getScriptRunner("jython", null, args);
       }
+      exitCode = runner.runInteractive(args);
       runner.close();
       System.exit(exitCode);
     }
@@ -125,8 +124,9 @@ public class SikuliScript {
     }
   }
 
-  public static void setRunner(IScriptRunner _runner) {
+  public static IScriptRunner setRunner(IScriptRunner _runner) {
     runner = _runner;
+    return runner;
   }
 
   public static void setShowActions(boolean flag) {
@@ -215,6 +215,10 @@ public class SikuliScript {
         runner.init(args);
         break;
       }
+    }
+    if (runner == null) {
+      Debug.error("Could not load any script runner!");
+      System.exit(1);
     }
     return runner;
   }

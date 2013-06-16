@@ -16,7 +16,7 @@
 	<artifactId>SikuliX-API</artifactId>
 	<name>SikuliX-API</name>
 	<url>http://www.sikuli.org</url>
-	<version>1.0</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
 	<licenses>
@@ -46,70 +46,6 @@
 		<url>git://github.com/RaiMan/SikuliX-API.git</url>
 	</scm>
 
-  <!-- Profiles are needed to include the right native resources -->
-	<profiles>
-		<profile>
-			<id>Windows32bit</id>
-			<activation>
-				<os>
-					<family>windows</family>
-					<arch>x32</arch> <!-- TODO: Check if this is the right value -->
-				</os>
-			</activation>
-			<properties>
-				<native.libs.dir>src/main/resources-win/libs32/</native.libs.dir>
-			</properties>
-		</profile>
-		<profile>
-			<id>Windows64bit</id>
-			<activation>
-				<os>
-					<family>windows</family>
-					<arch>x64</arch> <!-- TODO: Check if this is the right value -->
-				</os>
-			</activation>
-			<properties>
-				<native.libs.dir>src/main/resources-win/libs64/</native.libs.dir>
-			</properties>
-		</profile>
-		<profile>
-			<id>Linux32bit</id>
-			<activation>
-				<os>
-					<name>linux</name>
-					<arch>i386</arch>
-				</os>
-			</activation>
-			<properties>
-				<native.libs.dir>src/main/resources-linux/libs32/</native.libs.dir>
-			</properties>
-		</profile>
-		<profile>
-			<id>Linux64bit</id>
-			<activation>
-				<os>
-					<name>linux</name>
-					<arch>x86_64</arch> <!-- TODO: Check if this is the right value -->
-				</os>
-			</activation>
-			<properties>
-				<native.libs.dir>src/main/resources-linux/libs64/</native.libs.dir>
-			</properties>
-		</profile>
-		<profile>
-			<id>Mac</id>
-			<activation>
-				<os>
-					<family>mac</family>
-					<arch>x86_64</arch>
-				</os>
-			</activation>
-			<properties>
-				<native.libs.dir>src/main/resources-mac/libs/</native.libs.dir>
-			</properties>
-		</profile>
-	</profiles>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -133,6 +69,12 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.sikuli</groupId>
+			<artifactId>SikuliX-Jython</artifactId>
+			<version>1.0.1</version>
+		</dependency>
+
+    <dependency>
 			<groupId>commons-cli</groupId>
 			<artifactId>commons-cli</artifactId>
 			<version>1.2</version>
@@ -161,9 +103,9 @@
 	</dependencies>
 
 	<build>
+		<!-- Enable this plugin to include execute action (needed for eclipse)
 		<pluginManagement>
 			<plugins>
-				<!-- Enable this plugin to include execute action (needed for eclipse) -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -191,48 +133,13 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+    -->
 
-		<finalName>sikuli-japi</finalName>
-
-		<!-- copy native resources -->
-		<resources>
-			<resource> <!-- Native Resources, OS dependent -->
-				<directory>${native.libs.dir}</directory>
-				<targetPath>META-INF/libs</targetPath>
-			</resource>
-
-            <resource> <!-- Native Resources, not OS dependent -->
-				<directory>src/main/resources/libs/</directory>
-				<targetPath>META-INF/libs</targetPath>
-			</resource>
-		</resources>
+		<finalName>sikuli-api</finalName>
 
 		<plugins>
 
-      <!-- sample to run an Ant task
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-        <version>1.7</version>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <target>
-                <echo message="*** Running on: ${os.name} / ${os.arch}"/>
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      -->
-
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.1</version>
 				<configuration>
@@ -241,6 +148,20 @@
 				</configuration>
 			</plugin>
 
+			<!-- Plugin to create an executable jar -->
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>org.sikuli.script.SikuliScript</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<!-- Plugin to create an executable jar containing all dependencies-->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.4</version>
@@ -254,7 +175,7 @@
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
 					<finalName>sikuli-script</finalName>
-					<appendAssemblyId>false</appendAssemblyId>
+					<!-- <appendAssemblyId>false</appendAssemblyId> -->
 				</configuration>
 				<executions>
 					<execution>
@@ -267,23 +188,8 @@
 				</executions>
 			</plugin>
 
-			<!-- Plugin to create an executable jar -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>org.sikuli.script.SikuliScript</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-
 			<!-- Plugin to create an additional jar containing the source -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>2.2.1</version>
 				<executions>
@@ -296,6 +202,20 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
+
+			<!-- Plugin to run the jar using mvn exec:java -Dexec.args=" ... parms ... "-->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.1</version>
+        <executions><execution>
+          <goals><goal>java</goal></goals>
+        </execution></executions>
+        <configuration>
+          <mainClass>org.sikuli.script.SikuliScript</mainClass>
+        </configuration>
+      </plugin>
+
+    </plugins>
 	</build>
 </project>
