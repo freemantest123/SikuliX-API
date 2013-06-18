@@ -86,6 +86,7 @@ public class SikuliScript {
       }
       exitCode = runner.runInteractive(args);
       runner.close();
+      ScreenHighlighter.closeAll();
       System.exit(exitCode);
     }
 
@@ -210,7 +211,8 @@ public class SikuliScript {
     Iterator<IScriptRunner> scriptRunnerIterator = loader.iterator();
     while (scriptRunnerIterator.hasNext()) {
       IScriptRunner currentRunner = scriptRunnerIterator.next();
-      if ((name != null && currentRunner.getName().toLowerCase().equals(name.toLowerCase())) || (ending != null && currentRunner.hasFileEnding(ending) != null)) {
+      if ((name != null && currentRunner.getName().toLowerCase().equals(name.toLowerCase())) ||
+              (ending != null && currentRunner.hasFileEnding(ending) != null)) {
         runner = currentRunner;
         runner.init(args);
         break;

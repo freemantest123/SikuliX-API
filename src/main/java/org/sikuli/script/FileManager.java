@@ -12,9 +12,11 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -612,6 +614,11 @@ public class FileManager {
     String script;
     String scriptType;
     File scriptFile = null;
+    if (scriptName.getPath().contains("..")) {
+      //TODO accept double-dot pathnames
+      Debug.error("Sorry, scriptnames with dot or double-dot path elements are not supported: %s", scriptName.getPath());
+      System.exit(1);
+    }
     int pos = scriptName.getName().lastIndexOf(".");
     if (pos == -1) {
       script = scriptName.getName();
@@ -625,8 +632,15 @@ public class FileManager {
     }
     if ("sikuli".equals(scriptType)) {
       if (runner == null) {
-        //TODO identify runner from ending of file with same name as folder
-        runner = SikuliScript.setRunner(SikuliScript.getScriptRunner("jython", null, args));
+        // check for script.xxx inside folder
+        File[] content = scriptName.listFiles(new FileFilterScript(script+"."));
+        if (content == null || content.length == 0) {
+          Debug.error("Unable to get ScriptRunner from a contained file's file-ending named %s.xxx", script);
+          System.exit(1);
+        }
+        scriptFile = content[0];
+        scriptType = scriptFile.getName().substring(scriptFile.getName().lastIndexOf(".")+1);
+        runner = SikuliScript.setRunner(SikuliScript.getScriptRunner(null, scriptType, args));
       }
       if (scriptFile == null) {
         // try with fileending
@@ -661,5 +675,19 @@ public class FileManager {
       return scriptFile.getParentFile();
     }
     return scriptFile;
+  }
+
+  private static class FileFilterScript implements FilenameFilter {
+
+    private String _check;
+
+    public FileFilterScript(String check) {
+      _check = check;
+    }
+
+    @Override
+    public boolean accept(File dir, String fileName) {
+      return fileName.startsWith(_check);
+    }
   }
 }
