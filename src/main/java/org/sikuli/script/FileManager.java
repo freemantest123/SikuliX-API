@@ -26,27 +26,19 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.security.CodeSource;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.ServiceLoader;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.imageio.ImageIO;
 
 public class FileManager {
-
-  private static File jniDir = null;
   private static String jarResources = Settings.jarResources;
-  private static String libSource = Settings.libSource;
-  private static final ArrayList<String> libPaths = new ArrayList<String>();
-  private static StringBuffer alreadyLoaded = new StringBuffer("");
   static final int DOWNLOAD_BUFFER_SIZE = 153600;
-  private static List<String> libsList = new ArrayList<String>();
-  private static ClassLoader cl;
+  static INativeLoader nativeLoader = null;
 
-  static {
-    cl = FileManager.class.getClassLoader();
-    //TODO extractLibs();
-  }
 
   /**
    * System.load() the given library module <br /> from standard places (SikuliX/libs) in the
@@ -59,250 +51,11 @@ public class FileManager {
    * @throws IOException
    */
   public static void loadLibrary(String libname) {
-    if (libPaths.size() == 0) {
-      libPaths.add(Settings.libPath);
+    if (nativeLoader == null) {
+      nativeLoader = getNativeLoader("basic", null);
     }
-    File lib = null;
-    boolean libFound = false;
-    try {
-      lib = extractJni(libname);
-      if (lib == null) {
-        Debug.log(2, "Native library already loaded: " + libname);
-        return;
-      }
-      Debug.log(2, "Native library found: " + libname);
-      libFound = true;
-    } catch (IOException ex) {
-      Debug.error(FileManager.class.getName() + ".loadLibrary: Native library could not be extracted nor found: " + libname);
-      System.exit(1);
-    }
-    try {
-      System.load(lib.getAbsolutePath());
-    } catch (Error e) {
-      Debug.error(FileManager.class.getName() + ".loadLibrary: Native library could not be loaded: " + libname);
-      if (libFound) {
-        Debug.error("Since native library was found, it might be a problem with needed dependent libraries");
-        e.printStackTrace();
-      }
-      System.exit(1);
-    }
-    Debug.log(2, "Native library loaded: " + libname);
-  }
-
-  /**
-   * extract a JNI library from the classpath <br /> Mac: default is .jnilib (.dylib as fallback)
-   *
-   * @param libname System.loadLibrary() compatible library name
-   * @return the extracted File object
-   * @throws IOException
-   */
-  private static File extractJni(String libname) throws IOException {
-    if (alreadyLoaded.indexOf("*" + libname) < 0) {
-      alreadyLoaded.append("*" + libname);
-    } else {
-      return null;
-    }
-    String mappedlib = System.mapLibraryName(libname);
-    File outfile = new File(getJniDir(), mappedlib);
-
-    /* on darwin, the default mapping is to .jnilib; but
-     * if we don't find a .jnilib, try .dylib instead.
-     */
-    if (!outfile.exists()) {
-      URL res = cl.getResource(libSource + mappedlib);
-      if (res == null) {
-        if (mappedlib.endsWith(".jnilib")) {
-          mappedlib = mappedlib.substring(0, mappedlib.length() - 7) + ".dylib";
-          String jnilib = mappedlib.toString();
-          outfile = new File(getJniDir(), jnilib);
-          if (!outfile.exists()) {
-            if (cl.getResource(libSource + mappedlib) == null) {
-              throw new IOException("Library " + mappedlib + " not on classpath nor in default location");
-            } // else copy lib from jar
-          } else {
-            return outfile;
-          }
-        } else {
-          throw new IOException("Library " + mappedlib + " not on classpath nor in default location");
-        }
-      } // else copy lib from jar
-    } else {
-      return outfile;
-    }
-    File ret = extractJniResource(libSource + mappedlib, outfile);
-    return ret;
-  }
-
-  /**
-   * Gets the working directory to use for jni extraction. <br /> standard locations: <br /> Mac:
-   * "/Applications/Sikuli-IDE.app/Contents/libs" <br /> Windows / Linux & Mac (environment):
-   * %SIKULI_HOME% / $SIKULI_HOME <br /> if not exists: java.io.tmp/tmplib
-   *
-   * @return jni working dir
-   * @throws IOException if there's a problem creating the dir
-   */
-  private static File getJniDir() throws IOException {
-    if (jniDir == null) {
-      Debug.log(2, "Checking JNI library working directory");
-      for (String path : libPaths) {
-        if (path == null || "".equals(path)) {
-          continue;
-        }
-        jniDir = new File(path);
-        if (jniDir.exists()) {
-          System.setProperty("java.library.tmpdir", path);
-          Debug.log(2, "Using as JNI library working directory: '" + jniDir + "'");
-          Debug.log(2, "Using JNI directory as OCR directory (tessdata) too");
-          Settings.OcrDataPath = jniDir.getAbsolutePath();
-          return jniDir;
-        }
-      }
-      String libTmpDir = Settings.BaseTempPath + File.separator + "tmplib";
-      System.setProperty("java.library.tmpdir", libTmpDir);
-      jniDir = new File(libTmpDir);
-      Debug.log(2, "Initialised JNI library working directory to '" + jniDir + "'");
-    }
-
-    if (!jniDir.exists()) {
-      if (!jniDir.mkdirs()) {
-        throw new IOException("Unable to create JNI library working directory " + jniDir);
-      }
-    }
-    return jniDir;
-  }
-
-  /**
-   * extract a resource to a writable file
-   *
-   * @param resourcename the name of the resource on the classpath
-   * @param outputfile the file to copy to
-   * @return the extracted file
-   * @throws IOException
-   */
-  private static File extractJniResource(String resourcename, File outputfile) throws IOException {
-    InputStream in = cl.getResourceAsStream(resourcename);
-    if (in == null) {
-      throw new IOException("Resource " + resourcename + " not on classpath");
-    }
-    Debug.log(2, "Extracting '" + resourcename + "' to '" + outputfile.getAbsolutePath() + "'");
-    OutputStream out = new FileOutputStream(outputfile);
-    copy(in, out);
-    out.close();
-    in.close();
-    return outputfile;
-  }
-
-  /**
-   * extract a resource to an absolute path
-   *
-   * @param resourcename the name of the resource on the classpath
-   * @param outputname the path of the file to copy to
-   * @return the extracted file
-   * @throws IOException
-   */
-  private static File extractJniResource(String resourcename, String outputname) throws IOException {
-    return extractJniResource(resourcename, new File(outputname));
-  }
-
-  private static void extractLibs() {
-    Debug.log(2, "FileManager: trying to acces jar");
-    CodeSource src = FileManager.class.getProtectionDomain().getCodeSource();
-    int iDir = 0, iFile = 0;
-    if (src != null) {
-      URL jar = src.getLocation();
-      if (!jar.toString().endsWith(".jar")) {
-        Debug.log(2, "FileManager: not running from jar");
-      } else {
-        try {
-          ZipInputStream zip = new ZipInputStream(jar.openStream());
-          ZipEntry ze;
-          Debug.log(2, "FileManager: accessing jar: " + jar.toString());
-          while ((ze = zip.getNextEntry()) != null) {
-            String entryName = ze.getName();
-            if (entryName.startsWith("META-INF/libs")) {
-              //Debug.log(2, "FileManager: "+entryName);
-              libsList.add(entryName);
-              if (entryName.endsWith(File.separator)) {
-                iDir++;
-              } else {
-                iFile++;
-              }
-            }
-          }
-          Debug.log(2, "FileManager: found in META-INF/libs: Dirs: " + iDir + " Files: " + iFile);
-        } catch (IOException e) {
-          Debug.error("FileManager: List jar did not work");
-        }
-      }
-    } else {
-      Debug.error("FileManager: cannot access jar");
-    }
-  }
-
-  /**
-   * Assume the list of resources can be found at path/filelist.txt
-   *
-   * @return the local path to the extracted resources
-   */
-  public static String extract(String path) throws IOException {
-    InputStream in = cl.getResourceAsStream(path + "/filelist.txt");
-    String localPath = Settings.BaseTempPath + File.separator + "sikuli" + File.separator + path;
-    new File(localPath).mkdirs();
-    Debug.log(4, "extract resources " + path + " to " + localPath);
-    writeFileList(in, path, localPath);
-    return localPath + "/";
-  }
-
-  private static void writeFile(String from, String to) throws IOException {
-    Debug.log(7, "FileManager: JarResource: copy " + from + " to " + to);
-    File toF = new File(to);
-    toF.getParentFile().mkdirs();
-    InputStream in = cl.getResourceAsStream(from);
-    if (in != null) {
-      OutputStream out = null;
-      try {
-        out = new FileOutputStream(toF);
-        copy(in, out);
-      } catch (IOException e) {
-        Debug.log(7, "FileManager: JarResource: Can't extract " + from + ": " + e.getMessage());
-      } finally {
-        if (out != null) {
-          out.close();
-        }
-      }
-    } else {
-      Debug.log(7, "FileManager: JarResource: not found: " + from);
-    }
-  }
-
-  private static void writeFileList(InputStream ins, String fromPath, String outPath) throws IOException {
-    BufferedReader r = new BufferedReader(new InputStreamReader(ins));
-    String line;
-    while ((line = r.readLine()) != null) {
-      Debug.log(7, "write " + line);
-      if (line.startsWith("./")) {
-        line = line.substring(1);
-      }
-      String fullpath = outPath + line;
-      File outf = new File(fullpath);
-      outf.getParentFile().mkdirs();
-      InputStream in = cl.getResourceAsStream(fromPath + line);
-      if (in != null) {
-        OutputStream out = null;
-        try {
-          out = new FileOutputStream(outf);
-          copy(in, out);
-        } catch (IOException e) {
-          Debug.log("Can't extract " + fromPath + line + ": " + e.getMessage());
-        } finally {
-          if (out != null) {
-            out.close();
-          }
-        }
-      } else {
-        Debug.log("Resource not found: " + fromPath + line);
-      }
-    }
+    nativeLoader.check(nativeLoader.getLibType());
+    nativeLoader.export(libname+nativeLoader.getLibType(), null);
   }
 
   /**
@@ -312,7 +65,7 @@ public class FileManager {
    * @param out OutputStream to copy to
    * @throws IOException if there's an error
    */
-  private static void copy(InputStream in, OutputStream out) throws IOException {
+  public static void copy(InputStream in, OutputStream out) throws IOException {
     byte[] tmp = new byte[8192];
     int len = 0;
     while (true) {
@@ -690,4 +443,23 @@ public class FileManager {
       return fileName.startsWith(_check);
     }
   }
+  
+  public static INativeLoader getNativeLoader(String name, String[] args) {
+    INativeLoader nativeLoader = null;
+    ServiceLoader<INativeLoader> loader = ServiceLoader.load(INativeLoader.class);
+    Iterator<INativeLoader> scriptRunnerIterator = loader.iterator();
+    while (scriptRunnerIterator.hasNext()) {
+      INativeLoader currentRunner = scriptRunnerIterator.next();
+      if ((name != null && currentRunner.getName().toLowerCase().equals(name.toLowerCase()))) {
+        nativeLoader = currentRunner;
+        nativeLoader.init(args);
+        break;
+      }
+    }
+    if (nativeLoader == null) {
+      Debug.error("Could not load any NativeLoader!");
+      System.exit(1);
+    }
+    return nativeLoader;
+  }  
 }

@@ -117,10 +117,8 @@ public class Settings {
     // check parent folder of jar file
     if (libPath == null) {
       CodeSource src = Settings.class.getProtectionDomain().getCodeSource();
-      Debug.error("Trying jar folder: %s", src.toString());
       String lfp = null;
       if (src.getLocation() != null) {
-        Debug.error("Still Trying jar folder: %s", src.toString());
         String srcParent = (new File(src.getLocation().getPath())).getParent();
         db("jar Location: " + srcParent);
         try {
