@@ -91,6 +91,14 @@ public interface IScriptRunner {
    * Is executed before Sikuli closes. Can be used to cleanup the ScriptRunner
    */
   public void close();
+  
+  /**
+   * generic interface to a special runner action
+   * @param action identifies what to do
+   * @param args contains the needed parameters
+   * @return true if successful, false otherwise
+   */
+  public boolean doSomethingSpecial(String action, Object[] args);
 
   /**
    * add statements to be run after SCRIPT_HEADER, but before script is executed
